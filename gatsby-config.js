@@ -3,6 +3,7 @@ require(`dotenv`).config({
 })
 
 module.exports = {
+  pathPrefix: `fdk`,
   siteMetadata: {
     siteTitle: `fdk`,
     siteTitleAlt: `Home | fdk`,
