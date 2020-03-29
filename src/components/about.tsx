@@ -1,5 +1,6 @@
 /** @jsx jsx */
 import { jsx } from "theme-ui";
+import { withPrefix } from "gatsby";
 import Layout from "@lekoarts/gatsby-theme-minimal-blog/src/components/layout";
 import SEO from "@lekoarts/gatsby-theme-minimal-blog/src/components/seo";
 import { Avatar, Flex, Box } from "@theme-ui/components";
@@ -22,7 +23,7 @@ const AboutPage = () => {
           }}
         >
           <Avatar
-            src="/avatar.jpg"
+            src={withPrefix("/avatar.jpg")}
             sx={{ width: ["1/2", "1/2", "full", "full"], m: "auto" }}
           />
         </Box>
