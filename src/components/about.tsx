@@ -15,18 +15,18 @@ const AboutPage = () => {
         <Box p={2} sx={{ width: ["full", "full", "2/3", "2/3"] }}>
           <AboutText />
         </Box>
-        <Box
+        <Flex
           p={2}
           sx={{
-            display: "flex",
-            width: ["full", "full", "1/3", "1/3"]
+            justifyContent: "center",
+            width: ["full", "full", "1/3", "1/3"],
           }}
         >
           <Avatar
             src={withPrefix("/avatar.jpg")}
-            sx={{ width: ["1/2", "1/2", "full", "full"], m: "auto" }}
+            sx={{ width: ["1/2", "1/2", "full", "full"] }}
           />
-        </Box>
+        </Flex>
       </Flex>
     </Layout>
   );
