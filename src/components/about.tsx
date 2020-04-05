@@ -19,6 +19,7 @@ const AboutPage = () => {
           p={2}
           sx={{
             justifyContent: "center",
+            flexDirection: ["row", "row", "column", "column"],
             width: ["full", "full", "1/3", "1/3"],
           }}
         >
