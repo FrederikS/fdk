@@ -3,7 +3,7 @@ const prismToken = (t) => {
     // PrismJS syntax highlighting token styles
     // https://www.gatsbyjs.org/packages/gatsby-remark-prismjs/
     ".token": {
-      display: `inline`,
+      display: `inline-block`,
     },
     ".token.comment, .token.block-comment, .token.prolog, .token.doctype, .token.cdata": {
       color: t.colors.code.comment,
@@ -87,15 +87,6 @@ const gatsbyHighlight = (t) => {
       marginRight: 0,
       marginBottom: t.space[3],
     },
-    ".gatsby-highlight pre code": {
-      display: `block`,
-      fontSize: `100%`,
-      lineHeight: 1.5,
-      float: `left`,
-      minWidth: `100%`,
-      // reset code vertical padding declared earlier
-      padding: `0 ${t.space[6]}`,
-    },
     ".gatsby-highlight-code-line": {
       background: t.colors.code.lineHighlightBackground,
       marginLeft: `-${t.space[6]}`,
@@ -141,7 +132,7 @@ export const globalStyles = (t) => {
     },
     a: {
       transition: `all 0.3s ease-in-out`,
-      color: `text`,
+      color: t.colors.text,
     },
     "p > code, li > code": {
       backgroundColor: t.colors.code.bg,
