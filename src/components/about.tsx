@@ -25,7 +25,10 @@ const AboutPage = () => {
         >
           <Avatar
             src={withPrefix("/avatar.jpg")}
-            sx={{ width: ["1/2", "1/2", "full", "full"] }}
+            sx={{
+              width: ["1/2", "1/2", "full", "full"],
+              height: ["full", "full", "auto", "auto"],
+            }}
           />
         </Flex>
       </Flex>
