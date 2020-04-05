@@ -1,5 +1,3 @@
-import { css } from "theme-ui";
-
 const prismToken = (t) => {
   return {
     // PrismJS syntax highlighting token styles
@@ -52,9 +50,13 @@ const prismToken = (t) => {
     ".token.entity": {
       cursor: `help`,
     },
+    ".token.plain": {
+      color: t.colors.code.text,
+    },
     ".token-line": {
       marginLeft: `-${t.space[3]}`,
       marginRight: `-${t.space[3]}`,
+      paddingRight: t.space[3],
     },
     ".token-line > span.token:empty::after": {
       minHeight: `1em`,
@@ -113,6 +115,14 @@ const gatsbyHighlight = (t) => {
     ".gatsby-highlight pre::-webkit-scrollbar-track": {
       background: t.colors.code.scrollbarTrack,
     },
+    '.gatsby-highlight > code[class*="language-"], .gatsby-highlight > pre[class*="language-"]': {
+      wordSpacing: `normal`,
+      wordBreak: `normal`,
+      overflowWrap: `normal`,
+      lineHeight: 1.5,
+      tabSize: 4,
+      hyphens: `none`,
+    },
   };
 };
 
@@ -132,6 +142,14 @@ export const globalStyles = (t) => {
     a: {
       transition: `all 0.3s ease-in-out`,
       color: `text`,
+    },
+    "p > code, li > code": {
+      backgroundColor: t.colors.code.bg,
+      color: t.colors.code.text,
+      paddingLeft: t.space[2],
+      paddingRight: t.space[2],
+      paddingTop: t.space[1],
+      paddingBottom: t.space[1],
     },
     ".prism-code": {
       fontSize: t.fontSizes[1],
@@ -186,6 +204,6 @@ export const globalStyles = (t) => {
         marginLeft: `-${t.space[3]}`,
         marginRight: `-${t.space[3]}`,
       },
-    }
+    },
   };
 };
