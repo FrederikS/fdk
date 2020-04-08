@@ -134,7 +134,7 @@ public class MainVerticle extends AbstractVerticle {
                 .filter(bar -> bar.equals("foobar"))
                 .switchIfEmpty(Single.error(new IllegalStateException("Expecting input bar value.")))
                 .toCompletable()
-                .doOnComplete(() -> System.out.println("Saved and found foo with bar=foobar successfully."))
+                .doOnComplete(() -> System.out.println("Saved and found foo[bar=foobar] successfully."))
                 .subscribe(startFuture::complete, startFuture::fail);
     }
 
@@ -161,7 +161,7 @@ Okay, let's get the output of our application.
 ```shell
 Saved: Foo(id=7f4314e3-1578-44be-9135-a1e29fb9e453, bar=foobar)
 Found: Foo(id=7f4314e3-1578-44be-9135-a1e29fb9e453, bar=foobar)
-Saved and found foo with bar=foobar successfully.
+Saved and found foo[bar=foobar] successfully.
 ```
 
 Our implemenation seems to work and everything is fine. Let's go ahead.
@@ -320,7 +320,7 @@ public class MainVerticle extends AbstractVerticle {
                 .filter(bar -> bar.equals("foobar"))
                 .switchIfEmpty(Single.error(new IllegalStateException("Expecting input bar value.")))
                 .toCompletable()
-                .doOnComplete(() -> System.out.println("Saved and found foo with bar=foobar successfully."))
+                .doOnComplete(() -> System.out.println("Saved and found foo[bar=foobar] successfully."))
                 .subscribe(startFuture::complete, startFuture::fail);
     }
 
@@ -369,7 +369,7 @@ Here is the output.
 ```shell
 Saved: {"id":"ac571123-855b-4b2c-b9e9-059d65c273eb","bar":"foobar"}
 Found: {"id":"ac571123-855b-4b2c-b9e9-059d65c273eb","bar":"foobar"}
-Saved and found foo with bar=foobar successfully.
+Saved and found foo[bar=foobar] successfully.
 ```
 
 Our application is still working and it works as expected!
@@ -533,7 +533,7 @@ public class MainVerticle extends AbstractVerticle {
                 .filter(bar -> bar.equals("foobar"))
                 .switchIfEmpty(Single.error(new IllegalStateException("Expecting input bar value.")))
                 .toCompletable()
-                .doOnComplete(() -> System.out.println("Saved and found foo with bar=foobar successfully."))
+                .doOnComplete(() -> System.out.println("Saved and found foo[bar=foobar] successfully."))
                 .subscribe(startFuture::complete, startFuture::fail);
     }
 
@@ -632,7 +632,7 @@ Is the application still working? Here is the output.
 ```shell
 Saved: {"id":"2e702451-4ebe-4ebe-aecc-5d26be9fc5ec","bar":"foobar"}
 Found: {"id":"2e702451-4ebe-4ebe-aecc-5d26be9fc5ec","bar":"foobar"}
-Saved and found foo with bar=foobar successfully.
+Saved and found foo[bar=foobar] successfully.
 ```
 
 Yes it is.

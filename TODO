@@ -6,6 +6,7 @@
 ☐ analytics id
 ☐ Font: lalezar
 ☐ lighthouse check
-☐ fix favicon url (withPrefix)
-☐ change light theme code bg
-☐ fix avatar mobile margins
+✔ fix favicon url (withPrefix) @done(20-04-08 15:16)
+✔ change light theme code bg @done(20-04-08 15:16)
+✔ fix avatar mobile margins @done(20-04-08 15:16)
+☐ eliminate minimal blog stuff
