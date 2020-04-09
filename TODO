@@ -1,4 +1,4 @@
-☐ remove netlify plugin
+✔ remove netlify plugin @done(20-04-09 13:01)
 ✔ implement about page @done(20-03-29 18:10)
 ☐ check seo content
 ☐ check bundle and assets size
@@ -10,3 +10,4 @@
 ✔ change light theme code bg @done(20-04-08 15:16)
 ✔ fix avatar mobile margins @done(20-04-08 15:16)
 ☐ eliminate minimal blog stuff
+☐ remove loadable component from code component?
