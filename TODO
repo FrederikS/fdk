@@ -2,12 +2,12 @@
 ✔ implement about page @done(20-03-29 18:10)
 ☐ check seo content
 ☐ check bundle and assets size
-☐ update dependencies
+✔ update dependencies @done(20-04-09 13:10)
 ☐ analytics id
 ☐ Font: lalezar
 ☐ lighthouse check
 ✔ fix favicon url (withPrefix) @done(20-04-08 15:16)
 ✔ change light theme code bg @done(20-04-08 15:16)
 ✔ fix avatar mobile margins @done(20-04-08 15:16)
-☐ eliminate minimal blog stuff
+✔ eliminate minimal blog stuff @done(20-04-09 13:21)
 ☐ remove loadable component from code component?
