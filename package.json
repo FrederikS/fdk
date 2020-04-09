@@ -2,7 +2,7 @@
   "private": true,
   "name": "fdk",
   "description": "My personal blog",
-  "version": "1.0.8",
+  "version": "1.0.0",
   "author": "LekoArts <hello@lekoarts.de>",
   "license": "MIT",
   "scripts": {
