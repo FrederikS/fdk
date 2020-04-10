@@ -23,3 +23,5 @@ jobs:
       with:
         access-token: ${{ secrets.ACCESS_TOKEN }}
         deploy-branch: gh-pages
+      env:
+        GOOGLE_ANALYTICS_ID: ${{ secrets.GA_ID }}
