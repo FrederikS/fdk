@@ -139,7 +139,9 @@ Last option wont work since sdkman and candidates are installed in our users dir
 Second and third option seems to be the way to go.
 I chose `JAVA_HOME` because it seems to be more the standard of what is used by the majority of applications.
 
-#### What is the problem sdkman already exports `JAVA_HOME`?
+#### What is the problem? Sdkman exports the according enviroment variable.
+
+Indeed, sdkman already exports the proper `JAVA_HOME` environment variable, but only on shell scope.
 
 ```shell
 echo $JAVA_HOME
@@ -147,12 +149,11 @@ echo $JAVA_HOME
 /home/dudette/.sdkman/candidates/java/current
 ```
 
-Indeed, sdkman already exports the proper `JAVA_HOME` environment variable, but only on shell scope.
 We need it globally so that it is also picked up by application that are spawned by our window manager.
 Normally you would define global environment variable somewhere in `/etc/enviroment` or `/etc/profile`.
 But since sdkman runs on our user level it is a bad idea to put something user specific at system level and other users would get into trouble.
 
-#### Fixing env variables
+### Enable the enviroment variable globally for an user
 
 What we want is to define it global but only for our user.
 One way to do it, is to use the `systemd` daemon and put or enviroment variable to a conf file into our `~/.config/environment.d/` directory.
