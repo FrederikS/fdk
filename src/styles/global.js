@@ -192,7 +192,7 @@ export const globalStyles = (t) => {
     },
     ".code-title": {
       background: t.colors.code.bg,
-      borderBottom: `1.5px solid ${t.colors.code.border}`,
+      borderBottom: `1px solid ${t.colors.code.border}`,
       color: t.colors.code.text,
       padding: `${t.space[2]} ${t.space[4]} ${t.space[2]}`,
       fontSize: t.fontSizes[0],
