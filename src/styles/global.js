@@ -190,8 +190,17 @@ export const globalStyles = (t) => {
     "pre[class~='language-shell']:before": {
       content: `'shell'`,
     },
+    ".code-title": {
+      background: t.colors.code.bg,
+      borderBottom: `1.5px solid ${t.colors.code.border}`,
+      color: t.colors.code.text,
+      padding: `${t.space[2]} ${t.space[4]} ${t.space[2]}`,
+      fontSize: t.fontSizes[0],
+      marginTop: t.space[2],
+      fontFamily: `monospace`,
+    },
     [`@media (min-width: ${t.breakpoints[2]})`]: {
-      ".gatsby-highlight": {
+      ".gatsby-highlight,.code-title": {
         marginLeft: `-${t.space[3]}`,
         marginRight: `-${t.space[3]}`,
       },

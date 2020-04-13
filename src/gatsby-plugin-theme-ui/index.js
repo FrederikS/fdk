@@ -24,6 +24,7 @@ export default {
           class: "rgb(78, 201, 176)",
           bgLanguage: "black",
           textLanguage: "white",
+          border: `#2c2c2c`,
         },
       },
     },
@@ -43,6 +44,7 @@ export default {
       class: "#393A34",
       bgLanguage: "white",
       textLanguage: "black",
+      border: "#ececec"
     },
   },
 };
