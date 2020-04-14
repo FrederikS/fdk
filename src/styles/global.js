@@ -159,7 +159,7 @@ export const globalStyles = (t) => {
     },
     ".line-number-style": {
       display: `inline-block`,
-      width: `3em`,
+      width: t.space[4],
       userSelect: `none`,
       opacity: 0.3,
       textAlign: `center`,
