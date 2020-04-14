@@ -83,8 +83,8 @@ const gatsbyHighlight = (t) => {
       position: `relative`,
       WebkitOverflowScrolling: `touch`,
       overflow: `auto`,
-      marginLeft: 0,
-      marginRight: 0,
+      marginLeft: `-${t.space[3]}`,
+      marginRight: `-${t.space[3]}`,
       marginBottom: t.space[3],
     },
     ".gatsby-highlight-code-line": {
@@ -196,13 +196,15 @@ export const globalStyles = (t) => {
       color: t.colors.code.text,
       padding: `${t.space[2]} ${t.space[4]} ${t.space[2]}`,
       fontSize: t.fontSizes[0],
+      marginLeft: `-${t.space[3]}`,
+      marginRight: `-${t.space[3]}`,
       marginTop: t.space[2],
       fontFamily: `monospace`,
     },
-    [`@media (min-width: ${t.breakpoints[2]})`]: {
+    [`@media (min-width: ${t.breakpoints[1]})`]: {
       ".gatsby-highlight,.code-title": {
-        marginLeft: `-${t.space[3]}`,
-        marginRight: `-${t.space[3]}`,
+        marginLeft: 0,
+        marginRight: 0,
       },
     },
   };

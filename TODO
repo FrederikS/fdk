@@ -13,4 +13,6 @@
 ☐ remove loadable component from code component?
 ☐ add a deployment version to html
 ☐ exclude myself from ga tracking?
-☐ removed shadowed seo component
+✔ removed shadowed seo component @done(20-04-14 12:47)
+☐ Interactive elements like buttons and links should be large enough (48x48px), and have enough space around them, to be easy enough to tap without overlapping onto other elements. Learn more.
+☐ add sharing widgets
