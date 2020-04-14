@@ -14,9 +14,9 @@ One way of handling this, is to use SDKMAN and this is my machines' setup.
 
 ### Installation
 
-There is one AUR package available called `sdkman` but its seems to be an unoffical sdkman client.
+There is one AUR package available called `sdkman` but its seems to be an unofficial sdkman client.
 To use the official one you should follow the instructions from [here](https://sdkman.io/install). It is pretty fast and easy.
-Basically you install it via curl from the commandline.
+Basically you install it via curl from the command line.
 
 ```shell
 curl -s "https://get.sdkman.io" | bash
@@ -33,6 +33,12 @@ And to have a proper initialized sdkman for each shell session you have to add o
 ```
 
 Of course you need to replace the home directory name accordingly to your username or you might use something like `$HOME` from your env here.
+To avoid collision with java installed on system level it is useful to `unset` the default system java environment by using the `archlinux-java`
+script that comes along with the `java-runtime-common` package.
+
+```shell
+sudo archlinux-java unset
+```
 
 ### Usage
 
@@ -124,7 +130,7 @@ sdk default java 14.0.0-open
 ### The tricky part
 
 As long as you only working from the in your shell everything is working fine.
-But in case you want to work with an IDE like **vscode-java** and you are not starting it from the commandline
+But in case you want to work with an IDE like **vscode-java** and you are not starting it from the command line
 the current configured java version is not picked up properly.
 Why not and how does it work? There are several ways for **vscode-java** to define the jdk path that should be used.
 
@@ -139,7 +145,7 @@ Last option wont work since sdkman and candidates are installed in our users dir
 Second and third option seems to be the way to go.
 I chose `JAVA_HOME` because it seems to be more the standard of what is used by the majority of applications.
 
-#### What is the problem? Sdkman exports the according enviroment variable.
+#### What is the problem? Sdkman exports the according environment variable.
 
 Indeed, sdkman already exports the proper `JAVA_HOME` environment variable, but only on shell scope.
 
@@ -150,13 +156,13 @@ echo $JAVA_HOME
 ```
 
 We need it globally so that it is also picked up by application that are spawned by our window manager.
-Normally you would define global environment variable somewhere in `/etc/enviroment` or `/etc/profile`.
+Normally you would define global environment variable somewhere in `/etc/environment` or `/etc/profile`.
 But since sdkman runs on our user level it is a bad idea to put something user specific at system level and other users would get into trouble.
 
-### Enable the enviroment variable globally for an user
+### Enable the environment variable globally for an user
 
 What we want is to define it global but only for our user.
-One way to do it, is to use the `systemd` daemon and put or enviroment variable to a conf file into our `~/.config/environment.d/` directory.
+One way to do it, is to use the `systemd` daemon and put or environment variable to a conf file into our `~/.config/environment.d/` directory.
 
 ```shell:title=~/.config/environment.d/sdkman.conf
 JAVA_HOME=/home/dudette/.sdkman/candidates/java/current
@@ -164,6 +170,11 @@ JAVA_HOME=/home/dudette/.sdkman/candidates/java/current
 
 After a reboot or a re-login of your user `JAVA_HOME` should get picked up by **vscode-java** and other applications.
 Because the value here points to a symlink it will also work whenever you switch java versions.
+
+### Goody for ZSH users
+
+For those who are enjoying completions for zsh, they are also available for SDKMAN.
+Follow the instructions from [here](https://github.com/sdkman/sdkman-cli/blob/master/zsh/README.md) to set them up.
 
 Happy version switching!
 
@@ -174,3 +185,5 @@ Happy version switching!
 * https://sdkman.io/usage
 * https://github.com/redhat-developer/vscode-java#setting-the-jdk
 * https://wiki.archlinux.org/index.php/Environment_variables
+* https://github.com/sdkman/sdkman-cli/wiki/FAQ
+* https://github.com/sdkman/sdkman-cli/blob/master/zsh/README.md
