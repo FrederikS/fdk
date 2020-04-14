@@ -18,8 +18,8 @@ There is one AUR package available called `sdkman` but its seems to be an unoffi
 To use the official one you should follow the instructions from [here](https://sdkman.io/install). It is pretty fast and easy.
 Basically you install it via curl from the command line.
 
-```shell
-curl -s "https://get.sdkman.io" | bash
+```shell noLineNumbers
+> curl -s "https://get.sdkman.io" | bash
 ```
 
 This command installs all necessary scripts and files you need in your home directory.
@@ -28,7 +28,7 @@ This command installs all necessary scripts and files you need in your home dire
 
 And to have a proper initialized sdkman for each shell session you have to add one line to you `.bashrc` or `.zshrc`.
 
-```shell:title=~/.zshrc
+```shell:title=~/.zshrc noLineNumbers
 [[ -s "/home/dudette/.sdkman/bin/sdkman-init.sh" ]] && source "/home/dudette/.sdkman/bin/sdkman-init.sh"
 ```
 
@@ -36,16 +36,16 @@ Of course you need to replace the home directory name accordingly to your userna
 To avoid collision with java installed on system level it is useful to `unset` the default system java environment by using the `archlinux-java`
 script that comes along with the `java-runtime-common` package.
 
-```shell
-sudo archlinux-java unset
+```shell noLineNumbers
+> sudo archlinux-java unset
 ```
 
 ### Usage
 
 So far so good. We are ready to use sdkman. To install a java version we check which of them are available.
 
-```shell
-sdk ls java
+```shell noLineNumbers
+> sdk ls java
 
 ================================================================================
 Available Java Versions
@@ -112,19 +112,19 @@ Available Java Versions
 
 To install one of the candidates we are using the identifier from the last column of the output table.
 
-```shell
-sdk install java 11.0.3.hs-adpt
+```shell noLineNumbers
+> sdk install java 11.0.3.hs-adpt
 ```
 
 Whenever you want to switch from one version to another you either use the `use` or `default` command.
 The different between those is that `use` only changes the version for the current shell and `default` will change it for every shell.
 
-```shell
+```shell noLineNumbers
 // changes version for current shell
-sdk use java 14.0.0-open
+> sdk use java 14.0.0-open
 
 // changes version for every shell
-sdk default java 14.0.0-open
+> sdk default java 14.0.0-open
 ```
 
 ### The tricky part
@@ -149,8 +149,8 @@ I chose `JAVA_HOME` because it seems to be more the standard of what is used by 
 
 Indeed, sdkman already exports the proper `JAVA_HOME` environment variable, but only on shell scope.
 
-```shell
-echo $JAVA_HOME
+```shell noLineNumbers
+> echo $JAVA_HOME
 
 /home/dudette/.sdkman/candidates/java/current
 ```
@@ -164,7 +164,7 @@ But since sdkman runs on our user level it is a bad idea to put something user s
 What we want is to define it global but only for our user.
 One way to do it, is to use the `systemd` daemon and put or environment variable to a conf file into our `~/.config/environment.d/` directory.
 
-```shell:title=~/.config/environment.d/sdkman.conf
+```shell:title=~/.config/environment.d/sdkman.conf noLineNumbers
 JAVA_HOME=/home/dudette/.sdkman/candidates/java/current
 ```
 

@@ -200,6 +200,9 @@ export const globalStyles = (t) => {
       marginRight: `-${t.space[3]}`,
       marginTop: t.space[2],
       fontFamily: `monospace`,
+      '&[data-linenumber="false"]': {
+        paddingLeft: t.space[3],
+      },
     },
     [`@media (min-width: ${t.breakpoints[1]})`]: {
       ".gatsby-highlight,.code-title": {
