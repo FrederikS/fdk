@@ -44,7 +44,17 @@ export default {
       class: "#393A34",
       bgLanguage: "white",
       textLanguage: "black",
-      border: "#ececec"
+      border: "#ececec",
+    },
+  },
+  styles: {
+    ...baseTheme.styles,
+    a: {
+      ...baseTheme.styles.a,
+      "word-break": "break-word",
+      "overflow-wrap": "break-word",
+      "word-wrap": "break-word",
+      hyphens: "auto",
     },
   },
 };
