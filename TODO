@@ -3,7 +3,7 @@
 ☐ check seo content
 ☐ check bundle and assets size
 ✔ update dependencies @done(20-04-09 13:10)
-☐ analytics id
+✔ analytics id @done(20-04-15 13:45)
 ☐ Font: lalezar
 ☐ lighthouse check
 ✔ fix favicon url (withPrefix) @done(20-04-08 15:16)
@@ -14,7 +14,7 @@
 ☐ add a deployment version to html
 ☐ exclude myself from ga tracking?
 ✔ removed shadowed seo component @done(20-04-14 12:47)
-☐ Interactive elements like buttons and links should be large enough (48x48px), and have enough space around them, to be easy enough to tap without overlapping onto other elements. Learn more.
+✔ Interactive elements like buttons and links should be large enough (48x48px), and have enough space around them, to be easy enough to tap without overlapping onto other elements. Learn more. @done(20-04-15 15:14)
 ☐ add sharing widgets
 ✔ no linenumbers for one liners @done(20-04-14 20:00)
 ✔ shell code prompt sign @done(20-04-14 19:57)

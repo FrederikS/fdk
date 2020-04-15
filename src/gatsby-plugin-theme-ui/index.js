@@ -2,6 +2,10 @@ import baseTheme from "@lekoarts/gatsby-theme-minimal-blog/src/gatsby-plugin-the
 
 export default {
   ...baseTheme,
+  lineHeights: {
+    ...baseTheme.lineHeights,
+    body: "1.7",
+  },
   colors: {
     ...baseTheme.colors,
     modes: {
@@ -51,10 +55,18 @@ export default {
     ...baseTheme.styles,
     a: {
       ...baseTheme.styles.a,
-      "word-break": "break-word",
-      "overflow-wrap": "break-word",
-      "word-wrap": "break-word",
+      wordBreak: "break-word",
+      overflowWrap: "break-word",
+      wordWrap: "break-word",
       hyphens: "auto",
+      display: "inline-block",
+      py: [2, 1, 0, 0],
+      my: [-2, -1, 0, 0],
+      position: "relative",
+      verticalAlign: "top",
+    },
+    li: {
+      py: [2, 1, 0, 0],
     },
   },
 };
