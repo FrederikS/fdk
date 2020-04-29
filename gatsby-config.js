@@ -14,14 +14,16 @@ module.exports = {
     {
       resolve: `@lekoarts/gatsby-theme-minimal-blog`,
       options: {
+        blogPath: `/blog/`,
+        tagsPath: `/tags/`,
         navigation: [
           {
             title: `Blog`,
-            slug: `/blog`,
+            slug: `/blog/`,
           },
           {
             title: `About`,
-            slug: `/about`,
+            slug: `/about/`,
           },
         ],
         externalLinks: [
@@ -30,6 +32,13 @@ module.exports = {
             url: `https://twitter.com/Frederiiiiik`,
           }
         ],
+      },
+    },
+    `gatsby-plugin-force-trailing-slashes`,
+    {
+      resolve: `gatsby-plugin-canonical-urls`,
+      options: {
+        siteUrl: `https://fdk.codes`,
       },
     },
     {
