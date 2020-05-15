@@ -190,6 +190,9 @@ export const globalStyles = (t) => {
     "pre[class~='language-shell']:before": {
       content: `'shell'`,
     },
+    "pre[class~='language-yaml']:before": {
+      content: `'yaml'`,
+    },
     ".code-title": {
       background: t.colors.code.bg,
       borderBottom: `1px solid ${t.colors.code.border}`,

@@ -1,0 +1,417 @@
+---
+title: Securing Kubernetes Apps with Keycloak and Gatekeeper
+date: 2020-05-08
+description: Example of securing an application by using keycloak and the OIDC protocol along with gatekeeper. Everything running inside a Kubernetes cluster.
+tags:
+  - k8s
+  - keycloak
+  - oidc
+  - minikube
+---
+
+Today there are many ways to secure applications. With the rise of Kubernetes you might search for a self hosted open source
+solution for Identity Management. One of the most popular and powerful candidates is [Keycloak](https://www.keycloak.org).
+Lets explore how these both work together.
+
+For my sample scenario I am going to use [minikube](https://minikube.sigs.k8s.io/docs/) to setup a local Kubernetes cluster to work with.
+My goal is to protect an application running in this cluster without the need of adding any code to it.
+Additionally it should be a scaling solution that can be easily added to any other application running inside the cluster.
+As sample application to protect, I chose [httpbin](http://httpbin.org).
+
+### Setting up Keycloak with persistence
+
+At the very first I need a running keycloak instance to authenticate to.
+Even though the [keycloak-operator](https://github.com/keycloak/keycloak-operator) seems to be in a pretty early stage
+and might not work perfectly yet, I decided to give it a try. Lets clone the git repo and checkout the latest release.
+
+```shell noLineNumbers
+> git clone git@github.com:keycloak/keycloak-operator.git
+> cd keycloak-operator/
+> git checkout refs/tags/9.0.2
+```
+
+In order to use the custom keycloak resource definitions coming from the operator, they need to be applied to the cluster.
+There is a Makefile target that can be used for this. Along with CRDs it also deploys some roles, bindings, service accounts etc.
+After these basic cluster preparation the keycloak-operator can be deployed into the newly created keycloak namespace.
+
+```shell noLineNumbers
+> make cluster/prepare
+customresourcedefinition.apiextensions.k8s.io/keycloakbackups.keycloak.org created
+customresourcedefinition.apiextensions.k8s.io/keycloakclients.keycloak.org created
+customresourcedefinition.apiextensions.k8s.io/keycloakrealms.keycloak.org created
+customresourcedefinition.apiextensions.k8s.io/keycloaks.keycloak.org created
+customresourcedefinition.apiextensions.k8s.io/keycloakusers.keycloak.org created
+namespace/keycloak created
+role.rbac.authorization.k8s.io/keycloak-operator created
+rolebinding.rbac.authorization.k8s.io/keycloak-operator created
+serviceaccount/keycloak-operator created
+
+> kubectl config set-context --current --namespace=keycloak
+> kubectl apply -f deploy/operator.yaml
+deployment.apps/keycloak-operator created
+
+> kubectl rollout status deployment keycloak-operator
+Waiting for deployment "keycloak-operator" rollout to finish: 0 of 1 updated replicas are available...
+deployment "keycloak-operator" successfully rolled out
+```
+
+Since I do not want to lose my configured keycloak data every time I restart my minikube kubernetes
+cluster I want to setup keycloak with persistence. Before proceeding with the installation of keycloak
+it is necessary to setup a `PersistentVolume` that can be used for the underlying postgres database.
+
+```yaml noLineNumbers
+> cat <<EOF | kubectl create -f -
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: keycloak-postgresql-volume
+  labels:
+    app: keycloak
+spec:
+  storageClassName: standard
+  capacity:
+    storage: 2Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/data"
+EOF
+```
+
+Finally keycloak can be installed by using the `keycloaks.keycloak.org` CRD. It is going to deploy a postgresql database
+using our persistence volume that then can get picked up by keycloak.
+
+```yaml noLineNumbers
+> cat <<EOF | kubectl create -f -
+apiVersion: keycloak.org/v1alpha1
+kind: Keycloak
+metadata:
+  name: keycloak
+  labels:
+    app: keycloak
+spec:
+  instances: 1
+EOF
+
+> kubectl rollout status deployment keycloak-postgresql
+Waiting for deployment "keycloak-postgresql" rollout to finish: 0 of 1 updated replicas are available...
+deployment "keycloak-postgresql" successfully rolled out
+
+> kubectl rollout status statefulset keycloak
+Waiting for 1 pods to be ready...
+Waiting for partitioned roll out to finish: 0 out of 1 new pods have been updated...
+Waiting for 1 pods to be ready...
+Waiting for 1 pods to be ready...
+partitioned roll out complete: 1 new pods have been updated...
+```
+
+Keycloak is running and ready to be used.
+To setup an easy accessible address for the keycloak instance the minikube ingress addon together with a hostname entry can be used.
+While I am at adding hostnames, I already add another one that I need for resolving my sample httpbin application later on.
+Of course the corresponding Kubernetes ingress resource needs to be created as well. This resource could also be created by the
+keycloak operator by passing `externalAccess.enabled: True` to the keycloak spec, but it did not work for me due to some missing annotation
+for telling nginx to use https for the upstream service. So I created an ingress resource by myself.
+
+```shell noLineNumbers
+> minikube addons enable ingress
+🌟  The 'ingress' addon is enabled
+
+> echo "$(minikube ip) keycloak.local httpbin.local" | sudo tee -a /etc/hosts
+192.168.39.236 keycloak.local
+```
+
+```yaml noLineNumbers
+> cat <<EOF | kubectl apply -f -
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: keycloak
+  annotations:
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+spec:
+  rules:
+  - host: keycloak.local
+    http:
+      paths:
+      - backend:
+          serviceName: keycloak
+          servicePort: 8443
+EOF
+```
+
+If everything is set up correctly the keycloak instance should be accessible now.
+
+```shell noLineNumbers
+> curl -I http://keycloak.local/auth/
+HTTP/1.1 200 OK
+Server: openresty/1.15.8.2
+Date: Thu, 14 May 2020 12:05:06 GMT
+Content-Type: text/html;charset=utf-8
+Content-Length: 4071
+Connection: keep-alive
+Vary: Accept-Encoding
+Cache-Control: no-cache, must-revalidate, no-transform, no-store
+X-XSS-Protection: 1; mode=block
+X-Frame-Options: SAMEORIGIN
+Content-Security-Policy: frame-src 'self'; frame-ancestors 'self'; object-src 'none';
+X-Robots-Tag: none
+Strict-Transport-Security: max-age=31536000; includeSubDomains
+X-Content-Type-Options: nosniff
+```
+
+### Configuring Keycloak for the client application
+
+Now, after successfully installed keycloak to the cluster, it is time to prepare the instance for
+the client application. The easiest way might be to use the adminstration console UI from keycloak.
+It can be accessed via browser at `http://keycloak.local/auth/admin/`. The necessary admin credentials
+have been initially created as kubernetes secrets by the keycloak operator while installing.
+
+```shell noLineNumbers
+> kubectl get secret credential-keycloak -o jsonpath="{.data.ADMIN_USERNAME}" | base64 --decode; echo
+admin
+
+> kubectl get secret credential-keycloak -o jsonpath="{.data.ADMIN_PASSWORD}" | base64 --decode; echo
+P1Ps9dAGRsyyYA==
+```
+
+Taking the credentials to login to the adminstration console UI, the client configuration can be started.
+Following steps have to be done:
+
+* Create a new realm
+  * To not run into trouble with login later on since I have not set up proper certificates for tls I'll set a insecure "Frontend URL" to
+  `http://keycloak.local/auth`
+* Add a client with protocol `openid-connect` and access-type: `confidential`
+  * Add a Redirect-URL: `http://httpbin.local/oauth/callback`
+* Goto to the "Client Scopes" menu
+  * Add a new client scope and enter its settings afterwards enter Mappers tab and create new protocol with mapper type audience
+  * Select your client in "Included Client Audience"
+  * Set "Add to access token" to "On"
+* In client settings go to client scopes
+  * Add your created client scope containing the audience mapper
+* Add a user
+  * Set a password in the "Credentials" tab
+
+I called my realm `test` and my client `httpbin`. By setting the client access-type to `confidential` a client-secret has
+been generated by keycloak. It is needed for the gatekeeper configuration and can be found at the credentials tab of
+the client configuration.
+
+### Deploying Client Application along with Keycloak Gatekeeper
+
+By having a running keycloak instance configured with proper client settings and a test user, everything is in place
+to protect the sample httbin application. As mentioned in the introduction I would like to secure the application
+without adding code. Here comes [Keycloak Gatekeeper](https://github.com/keycloak/keycloak-gatekeeper) into play, which
+is an OIDC proxy service, handling authentication for an upstream application. The idea of gatekeeper is to have it as close
+as possible to the upstream application, thats why I am going to deploy it as sidecar to the httpbin application.
+But before proceeding with the deployment the client-secret (from keycloak client configuration) needs to be accessible in the cluster.
+
+```yaml noLineNumbers
+> echo -n '1fbf1a7c-c333-4d42-8f66-2ab63aac9d14' | base64
+MWZiZjFhN2MtYzMzMy00ZDQyLThmNjYtMmFiNjNhYWM5ZDE0
+
+> cat <<EOF | kubectl create -f -
+apiVersion: v1
+kind: Secret
+metadata:
+  name: httpbin-gatekeeper-secret
+type: Opaque
+data:
+  client-secret: MWZiZjFhN2MtYzMzMy00ZDQyLThmNjYtMmFiNjNhYWM5ZDE0
+EOF
+```
+
+Having the secret in place, finally the sample application along with gatekeeper can be deployed.
+
+```yaml noLineNumbers
+> cat <<EOF | kubectl apply -f -
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: httpbin
+spec:
+  selector:
+    matchLabels:
+      app: httpbin
+  template:
+    metadata:
+      labels:
+        app: httpbin
+    spec:
+      hostAliases:
+      - ip: "$(minikube ip)"
+        hostnames:
+        - "keycloak.local"
+      containers:
+      - name: httpbin
+        image: docker.io/kennethreitz/httpbin
+        imagePullPolicy: IfNotPresent
+        ports:
+          - containerPort: 80
+      - name: gatekeeper-sidecar
+        image: keycloak/keycloak-gatekeeper
+        imagePullPolicy: IfNotPresent
+        ports:
+          - name: http-gatekeeper
+            containerPort: 3000
+        args:
+          - --discovery-url=http://keycloak.local/auth/realms/test
+          - --client-id=httpbin
+          - --listen=0.0.0.0:3000
+          - --upstream-url=http://127.0.0.1:80
+          - --secure-cookie=false
+        env:
+          - name: PROXY_CLIENT_SECRET
+            valueFrom:
+              secretKeyRef:
+                name: httpbin-gatekeeper-secret
+                key: client-secret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: httpbin
+  labels:
+    app: httpbin
+spec:
+  ports:
+  - name: http
+    port: 80
+    targetPort: http-gatekeeper
+  selector:
+    app: httpbin
+  type: ClusterIP
+---
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: httpbin
+spec:
+  rules:
+  - host: httpbin.local
+    http:
+      paths:
+      - backend:
+          serviceName: httpbin
+          servicePort: 80
+EOF
+
+> kubectl rollout status deployment httpbin
+Waiting for deployment "httpbin" rollout to finish: 0 of 1 updated replicas are available...
+deployment "httpbin" successfully rolled out
+```
+
+Unfortunately the OIDC discovery of gatekeeper does not work when using the internal Keycloak Kubernetes service URL, due
+to a mismatch in provided issuer taken from the supplied discovery URL and the issuer returned by the provider. I found a related
+issue [here](https://github.com/keycloak/keycloak-gatekeeper/issues/539). To be able to resolve our "external" URL for keycloak
+inside the cluster, I needed to add the `hostAliases` property to the httpbin deployment spec. Similar to what I did on my local machine,
+it creates a `/etc/hosts` entry with the ip of minikube for the httpbin pod.
+
+### Is my Application protected now?
+
+To verify the protection of my httpbin application, I am going to use a couple of curl commands.
+First question could be, what happens when I try to access my httpbin application.
+
+```shell noLineNumbers
+> curl -I -L http://httpbin.local/
+
+HTTP/1.1 307 Temporary Redirect
+Server: openresty/1.15.8.2
+Date: Fri, 15 May 2020 11:51:38 GMT
+Content-Type: text/html; charset=utf-8
+Connection: keep-alive
+Location: /oauth/authorize?state=cadb8ba2-8487-4a86-9218-a4eb144cd6b8
+Set-Cookie: request_uri=Lw==; Path=/; Domain=httpbin.local; HttpOnly
+Set-Cookie: OAuth_Token_Request_State=cadb8ba2-8487-4a86-9218-a4eb144cd6b8; Path=/; Domain=httpbin.local; HttpOnly
+
+HTTP/1.1 307 Temporary Redirect
+Server: openresty/1.15.8.2
+Date: Fri, 15 May 2020 11:51:38 GMT
+Content-Type: text/html; charset=utf-8
+Connection: keep-alive
+Location: http://keycloak.local/auth/realms/test/protocol/openid-connect/auth?client_id=httpbin&redirect_uri=http%3A%2F%2Fhttpbin.local%2Foauth%2Fcallback&response_type=code&scope=openid+email+profile&state=cadb8ba2-8487-4a86-9218-a4eb144cd6b8
+
+HTTP/1.1 200 OK
+Server: openresty/1.15.8.2
+Date: Fri, 15 May 2020 11:51:38 GMT
+Content-Type: text/html;charset=utf-8
+Content-Length: 3041
+Connection: keep-alive
+Vary: Accept-Encoding
+Cache-Control: no-store, must-revalidate, max-age=0
+Set-Cookie: AUTH_SESSION_ID=570fa485-0497-4dc7-b903-cc1dc47d5857.keycloak-0; Version=1; Path=/auth/realms/test/; HttpOnly
+Set-Cookie: KC_RESTART=eyJhbGciOiJIUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICIwMTQ2MTc4ZC05NGMzLTQ3ODUtYTQyNS02OThkMTA0YzdlNTEifQ.eyJjaWQiOiJodHRwYmluIiwicHR5Ijoib3BlbmlkLWNvbm5lY3QiLCJydXJpIjoiaHR0cDovL2h0dHBiaW4ubG9jYWwvb2F1dGgvY2FsbGJhY2siLCJhY3QiOiJBVVRIRU5USUNBVEUiLCJub3RlcyI6eyJzY29wZSI6Im9wZW5pZCBlbWFpbCBwcm9maWxlIiwiaXNzIjoiaHR0cDovL2tleWNsb2FrLmxvY2FsL2F1dGgvcmVhbG1zL3Rlc3QiLCJyZXNwb25zZV90eXBlIjoiY29kZSIsInJlZGlyZWN0X3VyaSI6Imh0dHA6Ly9odHRwYmluLmxvY2FsL29hdXRoL2NhbGxiYWNrIiwic3RhdGUiOiJjYWRiOGJhMi04NDg3LTRhODYtOTIxOC1hNGViMTQ0Y2Q2YjgifX0.NVKObt_ujGgW3HyccqdYbG59ieutJDu-nW38eAXRdXs; Version=1; Path=/auth/realms/test/; HttpOnly
+X-XSS-Protection: 1; mode=block
+X-Frame-Options: SAMEORIGIN
+Content-Security-Policy: frame-src 'self'; frame-ancestors 'self'; object-src 'none';
+X-Robots-Tag: none
+Strict-Transport-Security: max-age=31536000; includeSubDomains
+X-Content-Type-Options: nosniff
+Content-Language: en
+```
+
+Cool, I get redirected to the keycloak login page. Lets use the credentials of the test-user I created earlier.
+
+```shell noLineNumbers
+> ACCESS_TOKEN=`curl --location --request POST 'http://keycloak.local/auth/realms/test/protocol/openid-connect/token' \
+--header 'Content-Type: application/x-www-form-urlencoded' \
+--data-urlencode 'grant_type=password' \
+--data-urlencode 'username=test-user-1' \
+--data-urlencode 'password=1234' \
+--data-urlencode 'client_id=httpbin' \
+--data-urlencode 'client_secret=1fbf1a7c-c333-4d42-8f66-2ab63aac9d14' | jq -r .access_token`
+
+> curl http://httpbin.local/bearer -H "Authorization: Bearer ${ACCESS_TOKEN}"
+
+{
+  "authenticated": true,
+  "token": "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJkMXZuY3pWU0R0VHdJOExXb3JQOFBfQUx3QkN4N25ZSURadFNYOVNSZUl3In0.eyJleHAiOjE1ODk1NDQwOTcsImlhdCI6MTU4OTU0Mzc5NywianRpIjoiZjEzZmNlMDQtZWI0OS00M2Y3LWJkYjgtMmI1MzdhMGYxYTIyIiwiaXNzIjoiaHR0cDovL2tleWNsb2FrLmxvY2FsL2F1dGgvcmVhbG1zL3Rlc3QiLCJhdWQiOlsiaHR0cGJpbiIsImFjY291bnQiXSwic3ViIjoiMDRiMGY3YmMtMTY0YS00ZDlhLTk5MTgtZjVlNGQzNzdkYmI5IiwidHlwIjoiQmVhcmVyIiwiYXpwIjoiaHR0cGJpbiIsInNlc3Npb25fc3RhdGUiOiJjMDI1NGIwOC00YzIwLTQwMzItYTYwMi1mYzY2ZWVmOGUyNzkiLCJhY3IiOiIxIiwicmVhbG1fYWNjZXNzIjp7InJvbGVzIjpbIm9mZmxpbmVfYWNjZXNzIiwidW1hX2F1dGhvcml6YXRpb24iXX0sInJlc291cmNlX2FjY2VzcyI6eyJhY2NvdW50Ijp7InJvbGVzIjpbIm1hbmFnZS1hY2NvdW50IiwibWFuYWdlLWFjY291bnQtbGlua3MiLCJ2aWV3LXByb2ZpbGUiXX19LCJzY29wZSI6InByb2ZpbGUgZW1haWwgaHR0cGJpbi1zY29wZSIsImVtYWlsX3ZlcmlmaWVkIjpmYWxzZSwibmFtZSI6Ik1heCBNdXN0ZXJtYW5uIiwicHJlZmVycmVkX3VzZXJuYW1lIjoidGVzdC11c2VyLTEiLCJnaXZlbl9uYW1lIjoiTWF4IiwiZmFtaWx5X25hbWUiOiJNdXN0ZXJtYW5uIiwiZW1haWwiOiJ0ZXN0LXVzZXItMUBtYWlsLmNvbSJ9.nFI7zz-Y1j1iuWyJ4ytUpAOuqB_Am_mQ12cB1HPvwr2oVOsOw7idKS51xcM1zOvwIV0BxrIQQlrAjjVMVHpxP3qyMBDDvS5_otNNszSZ1dhn5wyabLXqvGFwtRLAavHC0eFdy8dvUXmhznzmrLSnq-1SINt7IZsEB408SVO-V2PT1TmJHumfoTaqUx5xAbkhWvEakwGgt1FuxrgvLPOVLbu0xtdzRkYDLnAEKZrDvpnito4OoD5S-3fV5mJyUJ0U7Fq4ZTeO_4R1OLpubSiam9XiX8zRnM9VxutvNZU8gIIYYqr0Hi5eXA3sG__OueD_zkWdYDn0Q4plzE9K-R3ceg"
+}
+```
+
+Voilà! After getting an access token for my test-user, I can finally pass through gatekeeper to use my httpbin application, showing that I am authenticated.
+Goal reached! :) For upstream services it might be necessary to get some user information as well. These can be obtained from custom headers forwarded
+by gatekeeper.
+
+```shell noLineNumbers
+> curl http://httpbin.local/headers -H "Authorization: Bearer ${ACCESS_TOKEN}"
+{
+  "headers": {
+    "Accept": "*/*",
+    "Accept-Encoding": "gzip",
+    "Authorization": "Bearer eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJkMXZuY3pWU0R0VHdJOExXb3JQOFBfQUx3QkN4N25ZSURadFNYOVNSZUl3In0.eyJleHAiOjE1ODk1NDQ1ODgsImlhdCI6MTU4OTU0NDI4OCwianRpIjoiNGZkZGIyZWItOWQyZC00ZmM0LTk2MGMtZWFiY2EyYzk1YzIyIiwiaXNzIjoiaHR0cDovL2tleWNsb2FrLmxvY2FsL2F1dGgvcmVhbG1zL3Rlc3QiLCJhdWQiOlsiaHR0cGJpbiIsImFjY291bnQiXSwic3ViIjoiMDRiMGY3YmMtMTY0YS00ZDlhLTk5MTgtZjVlNGQzNzdkYmI5IiwidHlwIjoiQmVhcmVyIiwiYXpwIjoiaHR0cGJpbiIsInNlc3Npb25fc3RhdGUiOiIyODNkNmU4ZS1mMTUxLTRiZDUtYTFhYi0xODA1ZWQyN2NmZjQiLCJhY3IiOiIxIiwicmVhbG1fYWNjZXNzIjp7InJvbGVzIjpbIm9mZmxpbmVfYWNjZXNzIiwidW1hX2F1dGhvcml6YXRpb24iXX0sInJlc291cmNlX2FjY2VzcyI6eyJhY2NvdW50Ijp7InJvbGVzIjpbIm1hbmFnZS1hY2NvdW50IiwibWFuYWdlLWFjY291bnQtbGlua3MiLCJ2aWV3LXByb2ZpbGUiXX19LCJzY29wZSI6InByb2ZpbGUgZW1haWwgaHR0cGJpbi1zY29wZSIsImVtYWlsX3ZlcmlmaWVkIjpmYWxzZSwibmFtZSI6Ik1heCBNdXN0ZXJtYW5uIiwicHJlZmVycmVkX3VzZXJuYW1lIjoidGVzdC11c2VyLTEiLCJnaXZlbl9uYW1lIjoiTWF4IiwiZmFtaWx5X25hbWUiOiJNdXN0ZXJtYW5uIiwiZW1haWwiOiJ0ZXN0LXVzZXItMUBtYWlsLmNvbSJ9.L73SiC24OsRp9ngOTKw0fYUVL9GCECj0VF7TXLev5p5Cd6jfTcGx0YPMwAujKXPgItnDDc-PqaMinLCsx3VP6Nb7E4-2G5nRNOe56cllFZoB0ojYEFFOvpvhr7TwGUwWO0dxZ_ZWaFcbRPeayRdGjEMHeHhXyaQCHlGpuPNH44YBHhXQsJQ6mkNhHYysHWrHvbjt6W7Fdd8CG_OTjN3FS-4vUMGn_9apQNrejP8PgE-ImxMD2pfizERCMZcpUurq2mEIYvOvmhlriqT4AG3mt6BMH8UQ70ISTqJPFxkZajOY_1zgM15FQNs_SjVMfMKsq3cgq0hY-ho7ztnyKzgz3g",
+    "Host": "127.0.0.1:80",
+    "User-Agent": "curl/7.70.0",
+    "X-Auth-Audience": "httpbin,account",
+    "X-Auth-Email": "test-user-1@mail.com",
+    "X-Auth-Expiresin": "2020-05-15 12:09:48 +0000 UTC",
+    "X-Auth-Groups": "",
+    "X-Auth-Roles": "offline_access,uma_authorization,account:manage-account,account:manage-account-links,account:view-profile",
+    "X-Auth-Subject": "04b0f7bc-164a-4d9a-9918-f5e4d377dbb9",
+    "X-Auth-Token": "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJkMXZuY3pWU0R0VHdJOExXb3JQOFBfQUx3QkN4N25ZSURadFNYOVNSZUl3In0.eyJleHAiOjE1ODk1NDQ1ODgsImlhdCI6MTU4OTU0NDI4OCwianRpIjoiNGZkZGIyZWItOWQyZC00ZmM0LTk2MGMtZWFiY2EyYzk1YzIyIiwiaXNzIjoiaHR0cDovL2tleWNsb2FrLmxvY2FsL2F1dGgvcmVhbG1zL3Rlc3QiLCJhdWQiOlsiaHR0cGJpbiIsImFjY291bnQiXSwic3ViIjoiMDRiMGY3YmMtMTY0YS00ZDlhLTk5MTgtZjVlNGQzNzdkYmI5IiwidHlwIjoiQmVhcmVyIiwiYXpwIjoiaHR0cGJpbiIsInNlc3Npb25fc3RhdGUiOiIyODNkNmU4ZS1mMTUxLTRiZDUtYTFhYi0xODA1ZWQyN2NmZjQiLCJhY3IiOiIxIiwicmVhbG1fYWNjZXNzIjp7InJvbGVzIjpbIm9mZmxpbmVfYWNjZXNzIiwidW1hX2F1dGhvcml6YXRpb24iXX0sInJlc291cmNlX2FjY2VzcyI6eyJhY2NvdW50Ijp7InJvbGVzIjpbIm1hbmFnZS1hY2NvdW50IiwibWFuYWdlLWFjY291bnQtbGlua3MiLCJ2aWV3LXByb2ZpbGUiXX19LCJzY29wZSI6InByb2ZpbGUgZW1haWwgaHR0cGJpbi1zY29wZSIsImVtYWlsX3ZlcmlmaWVkIjpmYWxzZSwibmFtZSI6Ik1heCBNdXN0ZXJtYW5uIiwicHJlZmVycmVkX3VzZXJuYW1lIjoidGVzdC11c2VyLTEiLCJnaXZlbl9uYW1lIjoiTWF4IiwiZmFtaWx5X25hbWUiOiJNdXN0ZXJtYW5uIiwiZW1haWwiOiJ0ZXN0LXVzZXItMUBtYWlsLmNvbSJ9.L73SiC24OsRp9ngOTKw0fYUVL9GCECj0VF7TXLev5p5Cd6jfTcGx0YPMwAujKXPgItnDDc-PqaMinLCsx3VP6Nb7E4-2G5nRNOe56cllFZoB0ojYEFFOvpvhr7TwGUwWO0dxZ_ZWaFcbRPeayRdGjEMHeHhXyaQCHlGpuPNH44YBHhXQsJQ6mkNhHYysHWrHvbjt6W7Fdd8CG_OTjN3FS-4vUMGn_9apQNrejP8PgE-ImxMD2pfizERCMZcpUurq2mEIYvOvmhlriqT4AG3mt6BMH8UQ70ISTqJPFxkZajOY_1zgM15FQNs_SjVMfMKsq3cgq0hY-ho7ztnyKzgz3g",
+    "X-Auth-Userid": "test-user-1",
+    "X-Auth-Username": "test-user-1",
+    "X-Forwarded-Host": "httpbin.local",
+    "X-Scheme": "http"
+  }
+}
+```
+
+For having a better and more insightful reading experience I used curl here. Of course it is easier to verify the protection by navigate to
+`http://httpbin.local` in browser and go through the flow here.
+
+### Conclusion
+
+I think keycloak is a wonderful piece of software for handling user identity. It might be not the easiest to setup with Kubernetes yet,
+but I am confident especially keycloak-operator will improve quick and constantly. Using gatekeeper deployed as sidecar to the application
+you want to protect by providing a little configuration seems to me like a very scalable and consistent solution. At the time of
+microservices you want to focus as much as possible on business logic. This solution could save you from implementing same authentication
+layer over and over again. Additionally it can be applied to protect third-party applications like dashboards.
+
+Happy authenticating and authorizing!
+
+#### References
+
+* https://www.keycloak.org/getting-started/getting-started-kube
+* https://github.com/keycloak/keycloak-operator
+* https://www.keycloak.org/docs/latest/securing_apps/#_keycloak_generic_adapter
+* https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/annotations/#backend-protocol
+* https://kubernetes.io/docs/concepts/services-networking/add-entries-to-pod-etc-hosts-with-host-aliases/
