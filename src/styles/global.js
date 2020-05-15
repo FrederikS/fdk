@@ -141,6 +141,9 @@ export const globalStyles = (t) => {
       paddingRight: t.space[2],
       paddingTop: t.space[1],
       paddingBottom: t.space[1],
+      wordBreak: "break-word",
+      overflowWrap: "break-word",
+      wordWrap: "break-word",
     },
     ".prism-code": {
       fontSize: t.fontSizes[1],
