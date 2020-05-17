@@ -154,6 +154,7 @@ export const globalStyles = (t) => {
       float: `left`,
       minWidth: `100%`,
       marginBottom: 0,
+      textSizeAdjust: `none`,
       '&[data-linenumber="false"]': {
         ".token-line": {
           paddingLeft: t.space[3],
