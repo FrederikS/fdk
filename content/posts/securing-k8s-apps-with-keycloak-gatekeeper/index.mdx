@@ -230,10 +230,6 @@ spec:
       labels:
         app: httpbin
     spec:
-      hostAliases:
-      - ip: "$(minikube ip)"
-        hostnames:
-        - "keycloak.local"
       containers:
       - name: httpbin
         image: docker.io/kennethreitz/httpbin
@@ -252,6 +248,7 @@ spec:
           - --listen=0.0.0.0:3000
           - --upstream-url=http://127.0.0.1:80
           - --secure-cookie=false
+          - --openid-provider-proxy=http://keycloak-discovery:8080
         env:
           - name: PROXY_CLIENT_SECRET
             valueFrom:
@@ -293,11 +290,8 @@ Waiting for deployment "httpbin" rollout to finish: 0 of 1 updated replicas are 
 deployment "httpbin" successfully rolled out
 ```
 
-Unfortunately the OIDC discovery of gatekeeper does not work when using the internal Keycloak Kubernetes service URL, due
-to a mismatch in provided issuer taken from the supplied discovery URL and the issuer returned by the provider. I found a related
-issue [here](https://github.com/keycloak/keycloak-gatekeeper/issues/539). To be able to resolve our "external" URL for keycloak
-inside the cluster, I needed to add the `hostAliases` property to the httpbin deployment spec. Similar to what I did on my local machine,
-it creates a `/etc/hosts` entry with the ip of minikube for the httpbin pod.
+To make the OIDC discovery of gatekeeper work with the internal Keycloak Kubernetes service URL, it is necessary to pass it as argument
+to the `--openid-provider-proxy` parameter. I found a related issue [here](https://github.com/keycloak/keycloak-gatekeeper/issues/539).
 
 ### Is my Application protected now?
 
@@ -411,4 +405,3 @@ Happy authenticating and authorizing!
 * https://github.com/keycloak/keycloak-operator
 * https://www.keycloak.org/docs/latest/securing_apps/#_keycloak_generic_adapter
 * https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/annotations/#backend-protocol
-* https://kubernetes.io/docs/concepts/services-networking/add-entries-to-pod-etc-hosts-with-host-aliases/
