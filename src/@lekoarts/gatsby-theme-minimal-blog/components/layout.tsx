@@ -1,6 +1,6 @@
 import React from "react"
 import { Global } from "@emotion/core"
-import { Main, Styled, Container, css } from "theme-ui"
+import { Box, Styled, Container, css } from "theme-ui"
 import "typeface-ibm-plex-sans"
 import SEO from "@lekoarts/gatsby-theme-minimal-blog/src/components/seo"
 import Header from "@lekoarts/gatsby-theme-minimal-blog/src/components/header"
@@ -17,9 +17,9 @@ const Layout = ({ children, className }: LayoutProps) => (
     <SkipNavLink>Skip to content</SkipNavLink>
     <Container>
       <Header />
-      <Main id="skip-nav" className={className}>
+      <Box id="skip-nav" className={className}>
         {children}
-      </Main>
+      </Box>
       <Footer />
     </Container>
   </Styled.root>
