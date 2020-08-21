@@ -1,0 +1,50 @@
+---
+question: Is Java pass by reference or pass by value?
+---
+
+Java is **always** pass by value.
+
+It means the argument is copied to the parameter variable, so that the method
+operates on the copy. When the value of an object is passed, the **reference**
+to it is passed. If a reference points to a mutable object like an `ArrayList`
+and gets changed inside a method, the originally passed variable is also
+affected. Since passing an object as argument also means that the reference to
+the object is copied. As a result, both variables(original and parameter) refer
+to the same object.
+
+```java
+public class Playground {
+
+    public static void main(String[] args) {
+        int n = 1;
+        increaseAndMultiply(n);
+        System.out.println(n); // still 1
+    }
+
+    public static void increaseAndMultiply(int n) {
+        n++;
+        System.out.println(n*n); // 4
+    }
+
+}
+```
+
+```java
+import java.util.ArrayList;
+import java.util.List;
+
+public class Playground {
+
+    public static void main(String[] args) {
+        var list = new ArrayList<>(List.of("foo", "bar", "foobar"));
+        mutate(list);
+        System.out.println(list); // prints [foo, bar]
+    }
+
+    // object reference is passed by
+    public static void mutate(List<String> list) {
+        list.remove("foobar");
+    }
+
+}
+```

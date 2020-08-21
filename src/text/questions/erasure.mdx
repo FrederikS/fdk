@@ -1,0 +1,9 @@
+---
+question: What is type erasure?
+---
+
+Generics are checked at compile-time for type-correctness. The generic type
+information is removed in a process called type erasure. For example
+`List<Integer>` will be converted to the non-generic type `List` containing
+arbitrary `Objects`. Because of that, type parameters cannot be determined at
+run-time.

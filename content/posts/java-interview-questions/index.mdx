@@ -1,0 +1,45 @@
+---
+title: Some Java interview questions
+date: 2020-08-11
+description: While being on job search, I came across some interesting questions. I've gone through them to refresh some of my java knowledge.
+tags:
+  - java
+---
+
+import { Questions, Question } from "../../../src/components/questions";
+import questions from "../../../src/text/questions";
+
+<Questions>
+  {questions.map((q, i) => {
+    const Answer = q.default;
+    return (
+      <Question key={i} question={q._frontmatter.question}>
+        <Answer />
+      </Question>
+    );
+  })}
+</Questions>
+
+#### References
+
+- https://www.toptal.com/java/interview-questions
+- https://howtodoinjava.com/interview-questions/core-java-interview-questions-series-part-3/
+- https://medium.com/@yuhuan/covariance-and-contravariance-in-java-6d9bfb7f6b8e
+- http://tutorials.jenkov.com/java-concurrency/java-memory-model.html
+- http://tutorials.jenkov.com/java-concurrency/volatile.html
+- http://tutorials.jenkov.com/java-concurrency/synchronized.html
+- https://en.wikipedia.org/wiki/Singleton_pattern
+- https://en.wikipedia.org/wiki/Double-checked_locking#Usage_in_Java
+- https://en.wikipedia.org/wiki/Big_O_notation
+- https://www.bigocheatsheet.com/
+- https://stackoverflow.com/questions/479142/when-to-use-an-interface-instead-of-an-abstract-class-and-vice-versa
+- https://dzone.com/articles/java-virtual-machine-internals-class-loader
+
+
+#### TODO
+
+* go through questions for typos and content
+* scan more questions from https://www.baeldung.com/java-collections-interview-questions
+* all expanded when js disabled
+* style tables
+* style images

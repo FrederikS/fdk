@@ -1,0 +1,14 @@
+---
+question: What is the synchronized keyword?
+---
+
+Synchronized blocks can only be executed by a single thread at a time. They can
+thus be used to avoid race conditions. Without the `synchronized` keyword there
+are no guarantees about when a variable, that is kept in a CPU register by one
+thread, is written to or refreshed by reading from the main memory. By using the
+`synchronized` keyword, all variables visible to the thread are refreshed before
+entering the block and all changes to variables will be committed back to the
+main memory when leaving the block. For more advanced locking semantics
+Read/Write Locks are used. There are `Lock` interface implementations, which can
+be used for reading and/or writing with an optional fairness policy for the
+acquisition order enabled.

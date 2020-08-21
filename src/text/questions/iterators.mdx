@@ -1,0 +1,11 @@
+---
+question: Describe and compare fail-fast and fail-safe iterators.
+---
+
+**fail-fast**: Operates directly on the collection itself. Whenever the
+collection is modified while iterating it throws a
+`ConcurrentModificationException`. (e.g. `ArrayList`, `HashSet`, `HashMap`)
+
+**fail-save**: Operates on a cloned copy of the collection. Does not throw an
+exception when it gets modified while iterating. (e.g. `ConcurrentHashMap`,
+`CopyOnWriteArrayList`)

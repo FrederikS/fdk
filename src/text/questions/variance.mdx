@@ -1,0 +1,78 @@
+---
+question: What is invariance, covariance and contravariance?
+---
+
+Java’s generic type parameters are invariant. This means for any distinct types
+A and B, `G<A>` is not a subtype or supertype of `G<B>`. As a real world
+example, `List<Cat>` is not a supertype or subtype of `List<Animal>`.
+
+```java
+import java.util.List;
+
+interface Animal {};
+
+class Cat implements Animal {};
+class Dog implements Animal {};
+
+static void print(List<Animal> animals) {
+    animals.forEach(System.out::println);
+}
+
+static List<Animal> animals = List.of(new Cat(), new Dog());
+static List<Cat> cats = List.of(new Cat());
+static List<Dog> dogs = List.of(new Dog());
+
+print(animals); // works
+print(cats); // does not work
+print(dogs); // does not work
+```
+
+To achieve covariance the wildcard operator combined with an `extends` clause is
+used. The type parameter `T` is covariant in the generic type `List<T>` when `A`
+is a subtype of `B` and `List<A>` is a subtype of `List<B>`.
+
+```java
+import java.util.List;
+
+interface Animal {};
+
+class Cat implements Animal {};
+class Dog implements Animal {};
+
+static void print(List<? extends Animal> animals) {
+    animals.forEach(System.out::println);
+}
+
+static List<Animal> animals = List.of(new Cat(), new Dog());
+static List<Cat> cats = List.of(new Cat());
+static List<Dog> dogs = List.of(new Dog());
+
+print(animals); // works
+print(cats); // works
+print(dogs); // works
+```
+
+To achieve contravariance the wildcard operator combined with an `super` clause
+is used. The type parameter `T` is contravariant in the generic type `List<T>`
+when `A` is a subtype of `B` and `List<B>` is a subtype of `List<A>`.
+
+```java
+import java.util.List;
+
+interface Animal {};
+
+class Cat implements Animal {};
+class Dog implements Animal {};
+
+static void print(List<? super Cat> cats) {
+    cats.forEach(System.out::println);
+}
+
+static List<Animal> animals = List.of(new Cat(), new Dog());
+static List<Cat> cats = List.of(new Cat());
+static List<Dog> dogs = List.of(new Dog());
+
+print(animals); // works
+print(cats); // works
+print(dogs); // does not work
+```

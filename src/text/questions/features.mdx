@@ -1,0 +1,191 @@
+---
+question: New Language Features since 8?
+---
+
+* Modules (9)
+* private interface methods (9)
+* allow try-with-resources on effectively final variables (9)
+* diamond operator for anonymous classes (9)
+* Collection Factory Methods (`List.of()`, ...) (9)
+* Reactive Streams Interfaces (Flow.Publisher, Flow.Subscriber, Flow.Subscription...) (9)
+* Platform logging `System.Logger`, `System.getLogger()` (9)
+* local variable type inference with new keyword var (10)
+  * adhoc fields and methods
+
+```java
+static class InJava10 {
+
+    static void adHoc() {
+        var foobar = new Object() {
+            final String foo = "foo";
+            final Integer bar = 13;
+            final String foobar = foo + bar;
+
+            boolean isEvil() {
+                return true;
+            };
+        };
+
+        System.out.println(foobar.foo);
+        System.out.println(foobar.bar);
+        System.out.println(foobar.foobar);
+        System.out.println(foobar.isEvil());
+    }
+
+}
+
+InJava10.adHoc();
+```
+
+* HTTP/2 Client (reactive) (11)
+* Single-source-file execution (11)
+* not function for Predicates (11)
+* switch expressions (12, 13)
+
+```java
+import java.util.Random;
+
+static class InJava12 {
+
+    static void switchIt() {
+        var result = switch (new Random().nextInt(20)) {
+            case 13 -> "You're the winner";
+            case 0 -> "That was terrible. You lost.";
+            default -> "You lost.";
+        };
+
+        System.out.println(result);
+    }
+
+    static void switchItWithMultiCase() {
+        var result = switch (new Random().nextInt(20)) {
+            case 7,13 -> "You're the winner";
+            case 0 -> "That was terrible. You lost.";
+            default -> "You lost.";
+        };
+
+        System.out.println(result);
+    }
+
+    // yield comes with 13
+    static void switchItWithYield() {
+        var result = switch (new Random().nextInt(20)) {
+            case 13: {
+                yield "You're the winner";
+            }
+            case 0: {
+                yield "That was terrible. You lost.";
+            }
+            default: {
+                yield "You lost.";
+            }
+        };
+
+        System.out.println(result);
+    }
+
+}
+
+InJava12.switchIt();
+InJava12.switchItWithYield();
+InJava12.switchItWithMultiCase();
+```
+
+* Text blocks (13)
+
+```java
+static class InJava13 {
+
+    static void textBlock() {
+        var block = """
+                {
+                    "foo": "bar",
+                    "bar": 13
+                }
+                """;
+
+        System.out.println(block);
+    }
+
+}
+
+InJava13.textBlock();
+```
+
+* Records (14)
+* Pattern Matching for `instanceof`
+
+```java
+interface Animal {};
+
+class Cat implements Animal {
+    void miau() {
+        System.out.println("miau");
+    };
+};
+
+class Dog implements Animal {
+    void wuff() {
+        System.out.println("wuff");
+    };
+};
+
+
+// since 14
+static void withMatching(Animal animal) {
+    if(animal instanceof Cat c) {
+        c.miau();
+    } else if (animal instanceof Dog d) {
+        d.wuff();
+    }
+}
+
+// before 14
+static void withoutMatching(Animal animal) {
+    if(animal instanceof Cat) {
+        Cat c = (Cat) animal;
+        c.miau();
+    } else if (animal instanceof Dog) {
+        Dog d = (Dog) animal;
+        d.wuff();
+    }
+}
+
+withMatching(new Cat());
+withMatching(new Dog());
+```
+
+* Sealed Classes (15)
+
+```java
+public class Playground {
+
+    sealed interface Animal permits Animal.Cat, Animal.Dog {
+        record Cat() implements Animal {
+            void miau() {
+                System.out.println("miau");
+            };
+        };
+        record Dog() implements Animal {
+            void wuff() {
+                System.out.println("wuff");
+            };
+        };
+    };
+
+
+    static void withMatching(Animal animal) {
+        if(animal instanceof Animal.Cat c) {
+            c.miau();
+        } else if (animal instanceof Animal.Dog d) {
+            d.wuff();
+        }
+    }
+
+    public static void main(String[] args) {
+        withMatching(new Animal.Cat());
+        withMatching(new Animal.Dog());
+    }
+
+}
+```
