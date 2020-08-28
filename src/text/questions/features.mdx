@@ -1,191 +1,243 @@
 ---
-question: New Language Features since 8?
+question: What features have been added since Java 8? Can you name some?
 ---
 
-* Modules (9)
-* private interface methods (9)
-* allow try-with-resources on effectively final variables (9)
-* diamond operator for anonymous classes (9)
-* Collection Factory Methods (`List.of()`, ...) (9)
-* Reactive Streams Interfaces (Flow.Publisher, Flow.Subscriber, Flow.Subscription...) (9)
-* Platform logging `System.Logger`, `System.getLogger()` (9)
-* local variable type inference with new keyword var (10)
-  * adhoc fields and methods
+[9] **JPMS - Java Module Platform System**
 
-```java
-static class InJava10 {
+[9] **Private interface methods**
 
-    static void adHoc() {
-        var foobar = new Object() {
-            final String foo = "foo";
-            final Integer bar = 13;
-            final String foobar = foo + bar;
+[9] **Allow try-with-resources on effectively `final` variables**
 
-            boolean isEvil() {
-                return true;
-            };
-        };
+[9] **Diamond operator for anonymous classes**
 
-        System.out.println(foobar.foo);
-        System.out.println(foobar.bar);
-        System.out.println(foobar.foobar);
-        System.out.println(foobar.isEvil());
-    }
+[9] **Collection Factory Methods** (`List.of()`, `Map.of()`, ...)
 
-}
+[9] **Reactive Streams Interfaces** (`Flow.Publisher`, `Flow.Subscriber`,
+  `Flow.Subscription`, ...)
 
-InJava10.adHoc();
-```
+[9] **Platform logging** (`System.Logger`, `System.getLogger()`)
 
-* HTTP/2 Client (reactive) (11)
-* Single-source-file execution (11)
-* not function for Predicates (11)
-* switch expressions (12, 13)
-
-```java
-import java.util.Random;
-
-static class InJava12 {
-
-    static void switchIt() {
-        var result = switch (new Random().nextInt(20)) {
-            case 13 -> "You're the winner";
-            case 0 -> "That was terrible. You lost.";
-            default -> "You lost.";
-        };
-
-        System.out.println(result);
-    }
-
-    static void switchItWithMultiCase() {
-        var result = switch (new Random().nextInt(20)) {
-            case 7,13 -> "You're the winner";
-            case 0 -> "That was terrible. You lost.";
-            default -> "You lost.";
-        };
-
-        System.out.println(result);
-    }
-
-    // yield comes with 13
-    static void switchItWithYield() {
-        var result = switch (new Random().nextInt(20)) {
-            case 13: {
-                yield "You're the winner";
-            }
-            case 0: {
-                yield "That was terrible. You lost.";
-            }
-            default: {
-                yield "You lost.";
-            }
-        };
-
-        System.out.println(result);
-    }
-
-}
-
-InJava12.switchIt();
-InJava12.switchItWithYield();
-InJava12.switchItWithMultiCase();
-```
-
-* Text blocks (13)
-
-```java
-static class InJava13 {
-
-    static void textBlock() {
-        var block = """
-                {
-                    "foo": "bar",
-                    "bar": 13
-                }
-                """;
-
-        System.out.println(block);
-    }
-
-}
-
-InJava13.textBlock();
-```
-
-* Records (14)
-* Pattern Matching for `instanceof`
-
-```java
-interface Animal {};
-
-class Cat implements Animal {
-    void miau() {
-        System.out.println("miau");
-    };
-};
-
-class Dog implements Animal {
-    void wuff() {
-        System.out.println("wuff");
-    };
-};
-
-
-// since 14
-static void withMatching(Animal animal) {
-    if(animal instanceof Cat c) {
-        c.miau();
-    } else if (animal instanceof Dog d) {
-        d.wuff();
-    }
-}
-
-// before 14
-static void withoutMatching(Animal animal) {
-    if(animal instanceof Cat) {
-        Cat c = (Cat) animal;
-        c.miau();
-    } else if (animal instanceof Dog) {
-        Dog d = (Dog) animal;
-        d.wuff();
-    }
-}
-
-withMatching(new Cat());
-withMatching(new Dog());
-```
-
-* Sealed Classes (15)
+[10] **Local variable type inference with new keyword `var`**
 
 ```java
 public class Playground {
 
-    sealed interface Animal permits Animal.Cat, Animal.Dog {
-        record Cat() implements Animal {
-            void miau() {
-                System.out.println("miau");
-            };
-        };
-        record Dog() implements Animal {
-            void wuff() {
-                System.out.println("wuff");
-            };
-        };
+  public static void main(String[] args) {
+    var foobar = new Object() {
+      final String foo = "foo";
+      final Integer bar = 13;
+      final String foobar = foo + bar;
+
+      boolean isEvil() {
+        return true;
+      }
     };
 
+    System.out.println(foobar.foo);
+    System.out.println(foobar.bar);
+    System.out.println(foobar.foobar);
+    System.out.println(foobar.isEvil());
+  }
 
-    static void withMatching(Animal animal) {
-        if(animal instanceof Animal.Cat c) {
-            c.miau();
-        } else if (animal instanceof Animal.Dog d) {
-            d.wuff();
-        }
+}
+```
+
+[11] **HTTP/2 Client** (reactive)
+
+[11] **Single-source-file execution**
+
+[11] **Not function for Predicates**
+
+```java
+import java.util.stream.Stream;
+import static java.util.function.Predicate.not;
+
+public class Playground {
+
+  public static void main(String[] args) {
+    Stream.of("foo", "bar", "foobar")
+          .filter(not(s -> s.startsWith("foo")))
+          .forEach(System.out::println);
+  }
+
+}
+```
+
+[12] **Switch expressions**
+
+```java
+import java.util.Random;
+
+public class Playground {
+
+  public static void main(String[] args) {
+    switchIt();
+    switchItWithYield();
+    switchItWithMultiCase();
+  }
+
+  static void switchIt() {
+    var result = switch (new Random().nextInt(20)) {
+      case 13 -> "You're the winner";
+      case 0 -> "That was terrible. You lost.";
+      default -> "Try again.";
+    };
+
+    System.out.println(result);
+  }
+
+  // yield comes with 13
+  static void switchItWithYield() {
+    var result = switch (new Random().nextInt(20)) {
+      case 13: {
+        yield "You're the winner";
+      }
+      case 0: {
+        yield "That was terrible. You lost.";
+      }
+      default: {
+        yield "Try again.";
+      }
+    };
+
+    System.out.println(result);
+  }
+
+  static void switchItWithMultiCase() {
+    var result = switch (new Random().nextInt(20)) {
+      case 7, 13 -> "You're the winner";
+      case 0 -> "That was terrible. You lost.";
+      default -> "Try again.";
+    };
+
+    System.out.println(result);
+  }
+
+}
+```
+
+[13] **Text blocks**
+
+```java
+public class Playground {
+
+  public static void main(String[] args) {
+    var block = """
+            {
+                "foo": "bar",
+                "bar": 13
+            }
+            """;
+
+    System.out.println(block);
+  }
+
+}
+```
+
+[14] **Records**
+
+```java
+public class Playground {
+
+  public static void main(String[] args) {
+    var p1 = new Point(5.2f, 1.3f);
+    var p2 = new Point(5.2f, 1.3f);
+
+    p1.x = 4.6f // compile error - final fields, immutable
+
+    System.out.println(p1.equals(p2)); // true (equals, hashCode)
+    System.out.println(p1); // Point[x=5.2, y=1.3] (toString)
+  }
+
+  static record Point(float x, float y) { }
+
+  // compile error, records are final and cannot be used for inheritance
+  static record Point3d(float x, float y, float z) extends Point { }
+
+}
+```
+
+[14] **Pattern Matching for `instanceof`**
+
+```java
+public class Playground {
+
+  public static void main(String[] args) {
+    withMatching(new Cat());
+    withMatching(new Dog());
+    withoutMatching(new Cat());
+    withoutMatching(new Dog());
+  }
+
+  interface Animal { }
+
+  static class Cat implements Animal {
+    void miau() {
+      System.out.println("miau");
+    }
+  }
+
+  static class Dog implements Animal {
+    void wuff() {
+      System.out.println("wuff");
+    }
+  }
+
+  // since 14
+  static void withMatching(Animal animal) {
+    if (animal instanceof Cat c) {
+      c.miau();
+    } else if (animal instanceof Dog d) {
+      d.wuff();
+    }
+  }
+
+  // before 14
+  static void withoutMatching(Animal animal) {
+    if (animal instanceof Cat) {
+      Cat c = (Cat) animal;
+      c.miau();
+    } else if (animal instanceof Dog) {
+      Dog d = (Dog) animal;
+      d.wuff();
+    }
+  }
+
+}
+```
+
+[15] **Sealed Classes**
+
+```java
+public class Playground {
+
+  public static void main(String[] args) {
+    withMatching(new Animal.Cat());
+    withMatching(new Animal.Dog());
+  }
+
+  sealed interface Animal permits Animal.Cat, Animal.Dog {
+    record Cat() implements Animal {
+      void miau() {
+        System.out.println("miau");
+      }
     }
 
-    public static void main(String[] args) {
-        withMatching(new Animal.Cat());
-        withMatching(new Animal.Dog());
+    record Dog() implements Animal {
+      void wuff() {
+        System.out.println("wuff");
+      }
     }
+  }
+
+  static void withMatching(Animal animal) {
+    if (animal instanceof Animal.Cat c) {
+      c.miau();
+    } else if (animal instanceof Animal.Dog d) {
+      d.wuff();
+    }
+  }
 
 }
 ```

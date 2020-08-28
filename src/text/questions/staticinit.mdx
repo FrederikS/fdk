@@ -13,19 +13,19 @@ import java.util.Map;
 
 public class Playground {
 
-    private static final Map<String, Boolean> FEATURE_FLAGS;
+  private static final Map<String, Boolean> FEATURE_FLAGS;
 
-    static {
-        final Map<String, Boolean> flags = new HashMap<>();
-        flags.put("cool-feature", true);
-        flags.put("lame-feature", false);
-        FEATURE_FLAGS = Collections.unmodifiableMap(flags);
-    }
+  static {
+    final Map<String, Boolean> flags = new HashMap<>();
+    flags.put("cool-feature", true);
+    flags.put("lame-feature", false);
+    FEATURE_FLAGS = Collections.unmodifiableMap(flags);
+  }
 
-    public static void main(String[] args) {
-        // {lame-feature=false, cool-feature=true}
-        System.out.println(FEATURE_FLAGS);
-    }
+  public static void main(String[] args) {
+    // {lame-feature=false, cool-feature=true}
+    System.out.println(FEATURE_FLAGS);
+  }
 
 }
 ```

@@ -9,22 +9,28 @@ example, `List<Cat>` is not a supertype or subtype of `List<Animal>`.
 ```java
 import java.util.List;
 
-interface Animal {};
+public class Playground {
 
-class Cat implements Animal {};
-class Dog implements Animal {};
+  public static void main(String[] args) {
+    List<Animal> animals = List.of(new Cat(), new Dog());
+    List<Cat> cats = List.of(new Cat());
+    List<Dog> dogs = List.of(new Dog());
 
-static void print(List<Animal> animals) {
+    print(animals); // works
+    print(cats); // does not work
+    print(dogs); // does not work
+  }
+
+  interface Animal {}
+
+  static class Cat implements Animal {}
+  static class Dog implements Animal {}
+
+  static void print(List<Animal> animals) {
     animals.forEach(System.out::println);
+  }
+
 }
-
-static List<Animal> animals = List.of(new Cat(), new Dog());
-static List<Cat> cats = List.of(new Cat());
-static List<Dog> dogs = List.of(new Dog());
-
-print(animals); // works
-print(cats); // does not work
-print(dogs); // does not work
 ```
 
 To achieve covariance the wildcard operator combined with an `extends` clause is
@@ -34,22 +40,28 @@ is a subtype of `B` and `List<A>` is a subtype of `List<B>`.
 ```java
 import java.util.List;
 
-interface Animal {};
+public class Playground {
 
-class Cat implements Animal {};
-class Dog implements Animal {};
+  public static void main(String[] args) {
+    List<Animal> animals = List.of(new Cat(), new Dog());
+    List<Cat> cats = List.of(new Cat());
+    List<Dog> dogs = List.of(new Dog());
 
-static void print(List<? extends Animal> animals) {
+    print(animals); // works
+    print(cats); // works
+    print(dogs); // works
+  }
+
+  interface Animal {}
+
+  static class Cat implements Animal {}
+  static class Dog implements Animal {}
+
+  static void print(List<? extends Animal> animals) {
     animals.forEach(System.out::println);
+  }
+
 }
-
-static List<Animal> animals = List.of(new Cat(), new Dog());
-static List<Cat> cats = List.of(new Cat());
-static List<Dog> dogs = List.of(new Dog());
-
-print(animals); // works
-print(cats); // works
-print(dogs); // works
 ```
 
 To achieve contravariance the wildcard operator combined with an `super` clause
@@ -59,20 +71,26 @@ when `A` is a subtype of `B` and `List<B>` is a subtype of `List<A>`.
 ```java
 import java.util.List;
 
-interface Animal {};
+public class Playground {
 
-class Cat implements Animal {};
-class Dog implements Animal {};
+  public static void main(String[] args) {
+    List<Animal> animals = List.of(new Cat(), new Dog());
+    List<Cat> cats = List.of(new Cat());
+    List<Dog> dogs = List.of(new Dog());
 
-static void print(List<? super Cat> cats) {
+    print(animals); // works
+    print(cats); // works
+    print(dogs); // does not work
+  }
+
+  interface Animal {}
+
+  static class Cat implements Animal {}
+  static class Dog implements Animal {}
+
+  static void print(List<? super Cat> cats) {
     cats.forEach(System.out::println);
+  }
+
 }
-
-static List<Animal> animals = List.of(new Cat(), new Dog());
-static List<Cat> cats = List.of(new Cat());
-static List<Dog> dogs = List.of(new Dog());
-
-print(animals); // works
-print(cats); // works
-print(dogs); // does not work
 ```

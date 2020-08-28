@@ -26,52 +26,52 @@ import static java.lang.System.getLogger;
 
 public class Playground {
 
-    private static final Logger LOG = getLogger(Playground.class.getName());
-    private static final int SIZE = 10;
+  private static final Logger LOG = getLogger(Playground.class.getName());
+  private static final int SIZE = 10;
 
-    public static void main(String[] args) throws InterruptedException {
-        final Queue<Integer> queue = new LinkedList<>();
+  public static void main(String[] args) throws InterruptedException {
+    final Queue<Integer> queue = new LinkedList<>();
 
-        var producer = new Thread(() -> {
-            IntStream.rangeClosed(1, 100)
-                    .forEach(i -> {
-                        synchronized (queue) {
-                            while (queue.size() == SIZE) {
-                                try {
-                                    queue.wait();
-                                } catch (InterruptedException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                            queue.offer(i);
-                            LOG.log(INFO, "Produced: {0}", i);
-                            queue.notifyAll();
-                        }
-                    });
-        });
+    var producer = new Thread(() -> {
+      IntStream.rangeClosed(1, 100)
+               .forEach(i -> {
+                 synchronized (queue) {
+                   while (queue.size() == SIZE) {
+                     try {
+                       queue.wait();
+                     } catch (InterruptedException e) {
+                       e.printStackTrace();
+                     }
+                   }
+                   queue.offer(i);
+                   LOG.log(INFO, "Produced: {0}", i);
+                   queue.notifyAll();
+                 }
+               });
+    });
 
-        var consumer = new Thread(() -> {
-            while (true) {
-                try {
-                    synchronized (queue) {
-                        while (queue.isEmpty()) {
-                            queue.wait();
-                        }
-                        LOG.log(INFO, "Consumed: {0}", queue.poll());
-                        queue.notifyAll();
-                    }
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+    var consumer = new Thread(() -> {
+      while (true) {
+        try {
+          synchronized (queue) {
+            while (queue.isEmpty()) {
+              queue.wait();
             }
-        });
+            LOG.log(INFO, "Consumed: {0}", queue.poll());
+            queue.notifyAll();
+          }
+        } catch (InterruptedException e) {
+          e.printStackTrace();
+        }
+      }
+    });
 
-        producer.start();
-        consumer.start();
+    producer.start();
+    consumer.start();
 
-        producer.join();
-        consumer.join();
-    }
+    producer.join();
+    consumer.join();
+  }
 
 }
 ```
@@ -90,40 +90,40 @@ import static java.lang.System.getLogger;
 
 public class Playground {
 
-    private static final Logger LOG = getLogger(Playground.class.getName());
-    private static final int SIZE = 10;
+  private static final Logger LOG = getLogger(Playground.class.getName());
+  private static final int SIZE = 10;
 
-    public static void main(String[] args) throws InterruptedException {
-        final BlockingQueue<Integer> queue = new ArrayBlockingQueue<>(SIZE);
+  public static void main(String[] args) throws InterruptedException {
+    final BlockingQueue<Integer> queue = new ArrayBlockingQueue<>(SIZE);
 
-        var producer = new Thread(() -> {
-            IntStream.rangeClosed(1, 100)
-                    .forEach(i -> {
-                        try {
-                            queue.put(i);
-                            LOG.log(INFO, "Produced: {0}", i);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                    });
-        });
+    var producer = new Thread(() -> {
+      IntStream.rangeClosed(1, 100)
+               .forEach(i -> {
+                 try {
+                   queue.put(i);
+                   LOG.log(INFO, "Produced: {0}", i);
+                 } catch (InterruptedException e) {
+                   e.printStackTrace();
+                 }
+               });
+    });
 
-        var consumer = new Thread(() -> {
-            while (true) {
-                try {
-                    LOG.log(INFO, "Consumed: {0}", queue.take());
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
+    var consumer = new Thread(() -> {
+      while (true) {
+        try {
+          LOG.log(INFO, "Consumed: {0}", queue.take());
+        } catch (InterruptedException e) {
+          e.printStackTrace();
+        }
+      }
+    });
 
-        producer.start();
-        consumer.start();
+    producer.start();
+    consumer.start();
 
-        producer.join();
-        consumer.join();
-    }
+    producer.join();
+    consumer.join();
+  }
 
 }
 ```

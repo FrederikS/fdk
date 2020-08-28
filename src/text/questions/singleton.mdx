@@ -15,17 +15,17 @@ Typically, this is done by:
 ```java
 public class Singleton {
 
-    private Singleton() {
-        // initialization code
-    }
+  private Singleton() {
+    // initialization code
+  }
 
-    private static class SingletonHolder {
-        public static final Singleton instance = new Singleton();
-    }
+  private static class SingletonHolder {
+    public static final Singleton instance = new Singleton();
+  }
 
-    public static Singleton getInstance() {
-        return SingletonHolder.instance;
-    }
+  public static Singleton getInstance() {
+    return SingletonHolder.instance;
+  }
 
 }
 ```

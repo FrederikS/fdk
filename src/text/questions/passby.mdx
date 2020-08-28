@@ -15,16 +15,16 @@ to the same object.
 ```java
 public class Playground {
 
-    public static void main(String[] args) {
-        int n = 1;
-        increaseAndMultiply(n);
-        System.out.println(n); // still 1
-    }
+  public static void main(String[] args) {
+    int n = 1;
+    increaseAndMultiply(n);
+    System.out.println(n); // still 1
+  }
 
-    public static void increaseAndMultiply(int n) {
-        n++;
-        System.out.println(n*n); // 4
-    }
+  public static void increaseAndMultiply(int n) {
+    n++;
+    System.out.println(n * n); // 4
+  }
 
 }
 ```
@@ -35,16 +35,16 @@ import java.util.List;
 
 public class Playground {
 
-    public static void main(String[] args) {
-        var list = new ArrayList<>(List.of("foo", "bar", "foobar"));
-        mutate(list);
-        System.out.println(list); // prints [foo, bar]
-    }
+  public static void main(String[] args) {
+    var list = new ArrayList<>(List.of("foo", "bar", "foobar"));
+    mutate(list);
+    System.out.println(list); // prints [foo, bar]
+  }
 
-    // object reference is passed by
-    public static void mutate(List<String> list) {
-        list.remove("foobar");
-    }
+  // object reference is passed by
+  public static void mutate(List<String> list) {
+    list.remove("foobar");
+  }
 
 }
 ```

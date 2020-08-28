@@ -17,17 +17,17 @@ to terminate a thread.
 ```java
 public class Foo extends Thread {
 
-    private volatile boolean close = false;
+  private volatile boolean close = false;
 
-    public void run() {
-        while(!close) {
-            // do work
-        }
+  public void run() {
+    while(!close) {
+      // do work
     }
+  }
 
-    public void close() {
-        close = true;
-        // interrupt here if needed
-    }
+  public void close() {
+    close = true;
+    // interrupt here if needed
+  }
 }
 ```

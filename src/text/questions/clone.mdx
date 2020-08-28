@@ -2,54 +2,51 @@
 question: How to clone an object in Java?
 ---
 
-To clone an object in java it is required to implement the marker interface `Cloneable` and override the `Object.clone()` method in order to make the `protected` clone method accessible.
-Inside the method the value of `super.clone()` is returned. By default java is doing a shallow copy of the object here.
-That means all fields of a primitive type are getting copied but for objects only the reference is copied. thus no separate objects are created.
-With a deep copy you would have new objects with copied values would be created no matter how deeply nested they are.
+To clone an object in java it is necessary to implement the `Cloneable` marker
+interface and to override the `Object.clone()` method to make the `protected`
+clone method accessible. Inside the method the value of `super.clone()` is
+returned. By default java is doing a shallow copy of the object. That means all
+fields of a primitive type are getting copied, but for objects only the
+reference is copied. When a deep copy is created, all values of the object are
+copied to a newly created object, regardless of how deeply nested they are.
 
 Shallow copy:
 
 ```java
-import java.lang.System.Logger;
-
-import static java.lang.System.getLogger;
-
 public class Playground {
 
-    private static final Logger LOG = getLogger(Playground.class.getName());
+  public static void main(String[] args) throws CloneNotSupportedException {
+    final Foo foo1 = new Foo("foo", new Bar("bar"));
+    final Foo foo2 = foo1.clone();
 
-    public static void main(String[] args) throws CloneNotSupportedException {
-        final Foo foo1 = new Foo("foo", new Bar("bar"));
-        final Foo foo2 = foo1.clone();
+    System.out.println(foo1.equals(foo2)); // false
+    System.out.println(foo1.bar.equals(foo2.bar)); // true
+    System.out.println(foo1.foo.equals(foo2.foo)); // true
+    System.out.println(foo1.bar.bar.equals(foo2.bar.bar)); // true
+  }
 
-        LOG.log(Logger.Level.INFO, foo1.equals(foo2)); // false
-        LOG.log(Logger.Level.INFO, foo1.bar.equals(foo2.bar)); // true
-        LOG.log(Logger.Level.INFO, foo1.foo.equals(foo2.foo)); // true
-        LOG.log(Logger.Level.INFO, foo1.bar.bar.equals(foo2.bar.bar)); // true
+  private static class Foo implements Cloneable {
+    private final String foo;
+    private final Bar bar;
+
+    private Foo(String foo, Bar bar) {
+      this.foo = foo;
+      this.bar = bar;
     }
 
-    private static class Foo implements Cloneable {
-        private String foo;
-        private Bar bar;
-
-        private Foo(String foo, Bar bar) {
-            this.foo = foo;
-            this.bar = bar;
-        }
-
-        @Override
-        protected Foo clone() throws CloneNotSupportedException {
-            return (Foo) super.clone();
-        }
+    @Override
+    protected Foo clone() throws CloneNotSupportedException {
+      return (Foo) super.clone();
     }
+  }
 
-    private static class Bar {
-        private final String bar;
+  private static class Bar {
+    private final String bar;
 
-        private Bar(String bar) {
-            this.bar = bar;
-        }
+    private Bar(String bar) {
+      this.bar = bar;
     }
+  }
 
 }
 ```
@@ -57,53 +54,47 @@ public class Playground {
 Deep copy:
 
 ```java
-import java.lang.System.Logger;
-
-import static java.lang.System.getLogger;
-
 public class Playground {
 
-    private static final Logger LOG = getLogger(Playground.class.getName());
+  public static void main(String[] args) throws CloneNotSupportedException {
+    final Foo foo1 = new Foo("foo", new Bar("bar"));
+    final Foo foo2 = foo1.clone();
 
-    public static void main(String[] args) throws CloneNotSupportedException {
-        final Foo foo1 = new Foo("foo", new Bar("bar"));
-        final Foo foo2 = foo1.clone();
+    System.out.println(foo1.equals(foo2)); // false
+    System.out.println(foo1.bar.equals(foo2.bar)); // false
+    System.out.println(foo1.foo.equals(foo2.foo)); // true
+    System.out.println(foo1.bar.bar.equals(foo2.bar.bar)); // true
+  }
 
-        LOG.log(Logger.Level.INFO, foo1.equals(foo2)); // false
-        LOG.log(Logger.Level.INFO, foo1.bar.equals(foo2.bar)); // false
-        LOG.log(Logger.Level.INFO, foo1.foo.equals(foo2.foo)); // true
-        LOG.log(Logger.Level.INFO, foo1.bar.bar.equals(foo2.bar.bar)); // true
+  private static class Foo implements Cloneable {
+    private final String foo;
+    private Bar bar;
+
+    private Foo(String foo, Bar bar) {
+      this.foo = foo;
+      this.bar = bar;
     }
 
-    private static class Foo implements Cloneable {
-        private String foo;
-        private Bar bar;
+    @Override
+    protected Foo clone() throws CloneNotSupportedException {
+      final Foo clone = (Foo) super.clone();
+      clone.bar = clone.bar.clone();
+      return clone;
+    }
+  }
 
-        private Foo(String foo, Bar bar) {
-            this.foo = foo;
-            this.bar = bar;
-        }
+  private static class Bar implements Cloneable {
+    private final String bar;
 
-        @Override
-        protected Foo clone() throws CloneNotSupportedException {
-            final Foo clone = (Foo) super.clone();
-            clone.bar = clone.bar.clone();
-            return clone;
-        }
+    private Bar(String bar) {
+      this.bar = bar;
     }
 
-    private static class Bar implements Cloneable {
-        private final String bar;
-
-        private Bar(String bar) {
-            this.bar = bar;
-        }
-
-        @Override
-        protected Bar clone() throws CloneNotSupportedException {
-            return (Bar) super.clone();
-        }
+    @Override
+    protected Bar clone() throws CloneNotSupportedException {
+      return (Bar) super.clone();
     }
+  }
 
 }
 ```
