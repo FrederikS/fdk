@@ -71,10 +71,12 @@ const bounceRight = keyframes`
 `;
 
 export function Questions() {
+  // when js disabled, expand all
   const [preExpanded, setPreExpanded] = useState(
     questions.map((_q, i) => i + questions.length + "")
   );
 
+  // when js enabled, collapse all
   useEffect(() => {
     if (preExpanded.length > 0) {
       setPreExpanded([]);
