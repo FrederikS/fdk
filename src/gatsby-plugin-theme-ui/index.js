@@ -77,6 +77,7 @@ export default {
         pl: 0,
         borderColor: `muted`,
         borderBottomStyle: `solid`,
+        whiteSpace: `nowrap`,
       },
     },
   },

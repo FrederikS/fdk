@@ -24,6 +24,7 @@ const baseStylesChevron: SxStyleProp = {
   borderRadius: "100px",
   my: "auto",
   marginRight: 3,
+  flex: "none",
   color: "secondary",
 };
 
@@ -106,7 +107,7 @@ export function Questions() {
                 }}
               >
                 <AccordionItemHeading>
-                  <AccordionItemButton>
+                  <AccordionItemButton sx={{ p: 1 }}>
                     <Flex>
                       <AccordionItemState>
                         {({ expanded }) =>
