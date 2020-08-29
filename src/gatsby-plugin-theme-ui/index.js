@@ -68,5 +68,16 @@ export default {
     li: {
       py: [2, 1, 0, 0],
     },
+    table: {
+      ...baseTheme.styles.table,
+      [[`th`, `td`]]: {
+        textAlign: `left`,
+        py: 1,
+        pr: 4,
+        pl: 0,
+        borderColor: `muted`,
+        borderBottomStyle: `solid`,
+      },
+    },
   },
 };
