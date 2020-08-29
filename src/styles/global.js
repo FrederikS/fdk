@@ -217,5 +217,8 @@ export const globalStyles = (t) => {
         marginRight: 0,
       },
     },
+    "#___gatsby .gatsby-resp-image-wrapper": {
+      boxShadow: "none",
+    },
   };
 };

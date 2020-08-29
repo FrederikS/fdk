@@ -93,7 +93,7 @@ export function Questions() {
         const Answer = q.default;
         const uuid = i + preExpanded.length + "";
         return (
-          <Box py={3} key={uuid}>
+          <Box py={3} key={i}>
             <AccordionItem uuid={uuid}>
               <Heading
                 as="h4"
