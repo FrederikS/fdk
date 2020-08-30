@@ -220,5 +220,15 @@ export const globalStyles = (t) => {
     "#___gatsby .gatsby-resp-image-wrapper": {
       boxShadow: "none",
     },
+    ".highlight-line": {
+      background: t.colors.code.lineHighlightBackground,
+      borderLeft: `4px solid ${t.colors.code.lineHighlightBorder}`,
+      display: `block`,
+      ".line-number-style": {
+        width: `calc(${t.space[4]} - 4px)`,
+        opacity: 0.5,
+        left: `-2px`,
+      },
+    },
   };
 };

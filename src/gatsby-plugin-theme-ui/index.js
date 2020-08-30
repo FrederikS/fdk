@@ -29,6 +29,8 @@ export default {
           bgLanguage: "black",
           textLanguage: "white",
           border: `#2c2c2c`,
+          lineHighlightBackground: "rgba(54, 32, 102, 0.25)",
+          lineHighlightBorder: "#362066",
         },
       },
     },
@@ -49,6 +51,8 @@ export default {
       bgLanguage: "white",
       textLanguage: "black",
       border: "#ececec",
+      lineHighlightBackground: "#fbf0ea",
+      lineHighlightBorder: "#f1beb6",
     },
   },
   styles: {

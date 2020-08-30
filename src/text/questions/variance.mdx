@@ -37,7 +37,7 @@ To achieve covariance the wildcard operator combined with an `extends` clause is
 used. The type parameter `T` is covariant in the generic type `List<T>` when `A`
 is a subtype of `B` and `List<A>` is a subtype of `List<B>`.
 
-```java
+```java {20}
 import java.util.List;
 
 public class Playground {
@@ -68,7 +68,7 @@ To achieve contravariance the wildcard operator combined with an `super` clause
 is used. The type parameter `T` is contravariant in the generic type `List<T>`
 when `A` is a subtype of `B` and `List<B>` is a subtype of `List<A>`.
 
-```java
+```java {20}
 import java.util.List;
 
 public class Playground {
