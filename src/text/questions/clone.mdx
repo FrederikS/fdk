@@ -13,7 +13,7 @@ copied to a newly created object, regardless of how deeply nested they are.
 Shallow copy:
 
 ```java {22-25}
-public class Playground {
+public class ShallowCopy {
 
   public static void main(String[] args) throws CloneNotSupportedException {
     final Foo foo1 = new Foo("foo", new Bar("bar"));
@@ -54,7 +54,7 @@ public class Playground {
 Deep copy:
 
 ```java {22-27,37-40}
-public class Playground {
+public class DeepCopy {
 
   public static void main(String[] args) throws CloneNotSupportedException {
     final Foo foo1 = new Foo("foo", new Bar("bar"));

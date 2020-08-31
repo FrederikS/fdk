@@ -9,7 +9,7 @@ example, `List<Cat>` is not a supertype or subtype of `List<Animal>`.
 ```java
 import java.util.List;
 
-public class Playground {
+public class Invariance {
 
   public static void main(String[] args) {
     List<Animal> animals = List.of(new Cat(), new Dog());
@@ -40,7 +40,7 @@ is a subtype of `B` and `List<A>` is a subtype of `List<B>`.
 ```java {20}
 import java.util.List;
 
-public class Playground {
+public class Covariance {
 
   public static void main(String[] args) {
     List<Animal> animals = List.of(new Cat(), new Dog());
@@ -71,7 +71,7 @@ when `A` is a subtype of `B` and `List<B>` is a subtype of `List<A>`.
 ```java {20}
 import java.util.List;
 
-public class Playground {
+public class Contravariance {
 
   public static void main(String[] args) {
     List<Animal> animals = List.of(new Cat(), new Dog());
