@@ -18,7 +18,7 @@ others value. In that case you need to use `synchronized` keyword (or
 One common use-case for using `volatile` is for a flag to terminate a thread.
 
 ```java
-public class Foo extends Thread {
+public class ThreadWithVolatileFlag extends Thread {
 
   private volatile boolean close = false;
 
