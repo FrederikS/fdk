@@ -1,0 +1,26 @@
+---
+question: How does the Java memory model work?
+---
+
+The JVM divides memory between **thread stacks** and the **heap**.
+
+Each thread has its own thread stack. It contains the call stack, divided into
+stack frames for each method, that has been called, to reach the current point
+of execution. These stack frames store all local variables. A thread can only
+access its own thread stack.
+
+The heap contains all Objects created in your Java application regardless of
+what thread created the object, including objects of wrapper classes for
+primitive times (e.g. `Integer`, `Double`, `String`).
+
+All local variables of primitive types are fully stored on the thread stack and
+are not visible to other threads. A local variable may also be a reference to an
+object, then the reference is stored on the thread stack, but the object itself
+is stored on the heap. An Object may contain methods that also contain local
+variables, which are also stored on the thread stack, even if the object the
+method belongs to is stored on the heap.
+
+An Object's member variables (fields) no matter if primitive type or object
+reference are stored on the heap along with the object itself. Static class
+variables are also stored on the heap along with the class definition. Objects
+on the heap can be accessed by all threads, that have a reference to it.

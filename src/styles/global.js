@@ -206,6 +206,8 @@ export const globalStyles = (t) => {
       marginLeft: `-${t.space[3]}`,
       marginRight: `-${t.space[3]}`,
       marginTop: t.space[2],
+      borderTopLeftRadius: t.space[2],
+      borderTopRightRadius: t.space[2],
       fontFamily: `monospace`,
       '&[data-linenumber="false"]': {
         paddingLeft: t.space[3],
@@ -215,6 +217,19 @@ export const globalStyles = (t) => {
       ".gatsby-highlight,.code-title": {
         marginLeft: 0,
         marginRight: 0,
+      },
+    },
+    "#___gatsby .gatsby-resp-image-wrapper": {
+      boxShadow: "none",
+    },
+    ".highlight-line": {
+      background: t.colors.code.lineHighlightBackground,
+      borderLeft: `4px solid ${t.colors.code.lineHighlightBorder}`,
+      display: `block`,
+      ".line-number-style": {
+        width: `calc(${t.space[4]} - 4px)`,
+        opacity: 0.5,
+        left: `-2px`,
       },
     },
   };

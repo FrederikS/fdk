@@ -20,3 +20,11 @@
 ✔ shell code prompt sign @done(20-04-14 19:57)
 ☐ code copy button
 ✔ better seo descriptions @done(20-05-20 14:33)
+☐ sharing image, even when no image in article exists
+☐ add like/clap feature
+☐ add comment feature
+☐ add more mdx remark plugins https://github.com/remarkjs/remark-breaks, https://github.com/remarkjs/remark-slug
+☐ switch from GA to matomo
+☐ do i need a cookie consent?
+☐ show code snippets when js disabled
+☐ more than 3 latest posts

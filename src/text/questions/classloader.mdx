@@ -1,0 +1,25 @@
+---
+question:
+  What is the Java class loader? List and explain the purpose of the three types
+  of class loaders.
+---
+
+The Java `ClassLoader` is part of the JRE and is used to load classes at runtime
+on demand (lazy-loading) into the JVM. These classes can be loaded from a local
+or remote file system or even from the web. When the JVM is started **3** kinds
+of `ClassLoader` are used.
+
+1. **Bootstrap class loader** - The JVM built-in class loader, which defines the
+   classes in a handful of critical modules, such as `java.base`.
+
+2. **Platform class loader** - All classes in the Java SE Platform are
+   guaranteed to be visible through the platform class loader. In addition, the
+   classes in modules that are standardized under the Java Community Process but
+   not part of the Java SE Platform are guaranteed to be visible through the
+   platform class loader. (e.g. `java.net.http`)
+
+3. **System class loader**, also known as **application class loader**, that
+   defines classes on the application class path and module path. It is the
+   default loader for classes in modules that are neither Java SE nor JDK
+   modules. The platform class loader is a parent or ancestor of it, so it can
+   load platform classes by delegating to its parent.

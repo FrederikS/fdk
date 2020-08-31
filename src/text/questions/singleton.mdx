@@ -1,0 +1,38 @@
+---
+question: What is singleton class and how can you make a class singleton?
+---
+
+An implementation of the singleton pattern must:
+
+- ensure that only one instance of the singleton class ever exists
+- provide global access to that instance
+
+Typically, this is done by:
+
+- declaring all constructors of the class to be private
+- providing a static method that returns a reference to the instance
+
+```java
+public class Singleton {
+
+  private Singleton() {
+    // initialization code
+  }
+
+  private static class SingletonHolder {
+    public static final Singleton instance = new Singleton();
+  }
+
+  public static Singleton getInstance() {
+    return SingletonHolder.instance;
+  }
+
+}
+```
+
+The Bill Pugh singleton implementation from above, is the most widely used
+implementation to provide a thread safe singleton. It uses an static inner class
+for holding an instance of the enclosing class. This `SingletonHolder` class is
+not loaded until the `getInstance()` method is called. Before the calling thread
+is given access to it, the static instance is created as part of class loading.
+This means safe lazy loading without any need for synchronization/locks.

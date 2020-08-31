@@ -1,0 +1,38 @@
+---
+question: What is the ThreadLocal class? How and why would you use it?
+---
+
+A `ThreadLocal` instance is used to individually manage a state/value per
+thread. Whenever it is used inside a thread, it accesses its own independently
+initialized copy of the variable. Each thread holds an implicit reference of a
+`ThreadLocal` variable as long as the thread is alive. It provides a simple way
+to make code thread safe.
+
+```java
+public class ThreadLocalSample {
+
+  public static void main(String[] args) throws InterruptedException {
+    var threadLocal = new ThreadLocal<Integer>();
+
+    final Runnable runnable = () -> {
+      threadLocal.set((int) (Math.random() * 100D));
+
+      try {
+        Thread.sleep(2000);
+      } catch (InterruptedException ignored) { }
+
+      System.out.println(threadLocal.get());
+    };
+
+    final Thread t1 = new Thread(runnable);
+    final Thread t2 = new Thread(runnable);
+
+    t1.start();
+    t2.start();
+
+    t1.join();
+    t2.join();
+  }
+
+}
+```

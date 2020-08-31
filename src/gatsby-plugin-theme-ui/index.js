@@ -29,6 +29,8 @@ export default {
           bgLanguage: "black",
           textLanguage: "white",
           border: `#2c2c2c`,
+          lineHighlightBackground: "rgba(54, 32, 102, 0.25)",
+          lineHighlightBorder: "#362066",
         },
       },
     },
@@ -49,6 +51,8 @@ export default {
       bgLanguage: "white",
       textLanguage: "black",
       border: "#ececec",
+      lineHighlightBackground: "#fbf0ea",
+      lineHighlightBorder: "#f1beb6",
     },
   },
   styles: {
@@ -67,6 +71,18 @@ export default {
     },
     li: {
       py: [2, 1, 0, 0],
+    },
+    table: {
+      ...baseTheme.styles.table,
+      [[`th`, `td`]]: {
+        textAlign: `left`,
+        py: 1,
+        pr: 4,
+        pl: 0,
+        borderColor: `muted`,
+        borderBottomStyle: `solid`,
+        whiteSpace: `nowrap`,
+      },
     },
   },
 };

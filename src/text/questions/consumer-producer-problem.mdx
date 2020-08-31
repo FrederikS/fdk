@@ -1,0 +1,129 @@
+---
+question: What is the Java Producer-Consumer Problem and how can you solve it?
+---
+
+The consumer-producer problem, also knows as the bounded-buffer problem, is a
+classic example of a multi-process synchronization problem. It describes two
+processes, the producer and the consumer, which share a common, fixed-size
+buffer used as a queue. The producers job is to generate data, put it into the
+buffer and start again. At the same time, the consumer is consuming the data and
+removing it from the buffer, one piece at a time. The problem is to make sure,
+that the producer won't try to add data to a full buffer and that the consumer
+won't try to remove data from an empty buffer.
+
+It can be solved by synchronized access to a `Queue` implementation like
+`LinkedList` and the use of `wait()` and `notify()` for inter-process
+communication.
+
+```java
+import java.lang.System.Logger;
+import java.util.LinkedList;
+import java.util.Queue;
+import java.util.stream.IntStream;
+
+import static java.lang.System.Logger.Level.INFO;
+import static java.lang.System.getLogger;
+
+public class SynchronizedQueueCPP {
+
+  private static final Logger LOG = getLogger(SynchronizedQueueCPP.class.getName());
+  private static final int SIZE = 10;
+
+  public static void main(String[] args) throws InterruptedException {
+    final Queue<Integer> queue = new LinkedList<>();
+
+    var producer = new Thread(() -> {
+      IntStream.rangeClosed(1, 100)
+               .forEach(i -> {
+                 synchronized (queue) {
+                   while (queue.size() == SIZE) {
+                     try {
+                       queue.wait();
+                     } catch (InterruptedException e) {
+                       e.printStackTrace();
+                     }
+                   }
+                   queue.offer(i);
+                   LOG.log(INFO, "Produced: {0}", i);
+                   queue.notifyAll();
+                 }
+               });
+    });
+
+    var consumer = new Thread(() -> {
+      while (true) {
+        try {
+          synchronized (queue) {
+            while (queue.isEmpty()) {
+              queue.wait();
+            }
+            LOG.log(INFO, "Consumed: {0}", queue.poll());
+            queue.notifyAll();
+          }
+        } catch (InterruptedException e) {
+          e.printStackTrace();
+        }
+      }
+    });
+
+    producer.start();
+    consumer.start();
+
+    producer.join();
+    consumer.join();
+  }
+
+}
+```
+
+Another easier approach could be to use a `BlockingQueue`, that is already
+handling synchronization and communication internally.
+
+```java
+import java.lang.System.Logger;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
+import java.util.stream.IntStream;
+
+import static java.lang.System.Logger.Level.INFO;
+import static java.lang.System.getLogger;
+
+public class BlockingQueueCPP {
+
+  private static final Logger LOG = getLogger(BlockingQueueCPP.class.getName());
+  private static final int SIZE = 10;
+
+  public static void main(String[] args) throws InterruptedException {
+    final BlockingQueue<Integer> queue = new ArrayBlockingQueue<>(SIZE);
+
+    var producer = new Thread(() -> {
+      IntStream.rangeClosed(1, 100)
+               .forEach(i -> {
+                 try {
+                   queue.put(i);
+                   LOG.log(INFO, "Produced: {0}", i);
+                 } catch (InterruptedException e) {
+                   e.printStackTrace();
+                 }
+               });
+    });
+
+    var consumer = new Thread(() -> {
+      while (true) {
+        try {
+          LOG.log(INFO, "Consumed: {0}", queue.take());
+        } catch (InterruptedException e) {
+          e.printStackTrace();
+        }
+      }
+    });
+
+    producer.start();
+    consumer.start();
+
+    producer.join();
+    consumer.join();
+  }
+
+}
+```
