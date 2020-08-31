@@ -2,242 +2,54 @@
 question: What features have been added since Java 8? Can you name some?
 ---
 
-[9] **JPMS - Java Module Platform System**
+import { DividerTitle } from "../../components/divider";
 
-[9] **Private interface methods**
+<DividerTitle as="h5" variant="styles.h6">
+  9
+</DividerTitle>
 
-[9] **Allow try-with-resources on effectively `final` variables**
+- [JPMS - Java Module Platform System](https://openjdk.java.net/jeps/261)
+- [Private interface methods](https://openjdk.java.net/jeps/213)
+- [Allow try-with-resources on effectively `final` variables](https://openjdk.java.net/jeps/213)
+- [Diamond operator for anonymous classes](https://openjdk.java.net/jeps/213)
+- [Collection Factory Methods](https://openjdk.java.net/jeps/269)
+- [Reactive Streams Interfaces](https://openjdk.java.net/jeps/266)
+- [Platform logging](https://openjdk.java.net/jeps/264)
 
-[9] **Diamond operator for anonymous classes**
+<DividerTitle as="h5" variant="styles.h6">
+  10
+</DividerTitle>
 
-[9] **Collection Factory Methods** (`List.of()`, `Map.of()`, ...)
+- [Local-Variable Type Inference](https://openjdk.java.net/jeps/286)
 
-[9] **Reactive Streams Interfaces** (`Flow.Publisher`, `Flow.Subscriber`,
-  `Flow.Subscription`, ...)
+<DividerTitle as="h5" variant="styles.h6">
+  11
+</DividerTitle>
 
-[9] **Platform logging** (`System.Logger`, `System.getLogger()`)
+- [HTTP/2 Client](https://openjdk.java.net/jeps/321)
 
-[10] **Local variable type inference with new keyword `var`**
+<DividerTitle as="h5" variant="styles.h6">
+  12
+</DividerTitle>
 
-```java {4}
-public class Playground {
+- [Switch expressions](https://openjdk.java.net/jeps/325)
 
-  public static void main(String[] args) {
-    var foobar = new Object() {
-      final String foo = "foo";
-      final Integer bar = 13;
-      final String foobar = foo + bar;
+<DividerTitle as="h5" variant="styles.h6">
+  13
+</DividerTitle>
 
-      boolean isEvil() {
-        return true;
-      }
-    };
+- [Text blocks](https://openjdk.java.net/jeps/355)
 
-    System.out.println(foobar.foo);
-    System.out.println(foobar.bar);
-    System.out.println(foobar.foobar);
-    System.out.println(foobar.isEvil());
-  }
+<DividerTitle as="h5" variant="styles.h6">
+  14
+</DividerTitle>
 
-}
-```
+- [Records](https://openjdk.java.net/jeps/359)
+- [Helpful NullPointerExceptions](https://openjdk.java.net/jeps/358)
+- [Pattern Matching for `instanceof`](https://openjdk.java.net/jeps/305)
 
-[11] **HTTP/2 Client** (reactive)
+<DividerTitle as="h5" variant="styles.h6">
+  15
+</DividerTitle>
 
-[11] **Single-source-file execution**
-
-[11] **Not function for Predicates**
-
-```java {8}
-import java.util.stream.Stream;
-import static java.util.function.Predicate.not;
-
-public class Playground {
-
-  public static void main(String[] args) {
-    Stream.of("foo", "bar", "foobar")
-          .filter(not(s -> s.startsWith("foo")))
-          .forEach(System.out::println);
-  }
-
-}
-```
-
-[12] **Switch expressions**
-
-```java
-import java.util.Random;
-
-public class Playground {
-
-  public static void main(String[] args) {
-    switchIt();
-    switchItWithYield();
-    switchItWithMultiCase();
-  }
-
-  static void switchIt() {
-    var result = switch (new Random().nextInt(20)) {
-      case 13 -> "You're the winner";
-      case 0 -> "That was terrible. You lost.";
-      default -> "Try again.";
-    };
-
-    System.out.println(result);
-  }
-
-  // yield comes with 13
-  static void switchItWithYield() {
-    var result = switch (new Random().nextInt(20)) {
-      case 13: {
-        yield "You're the winner";
-      }
-      case 0: {
-        yield "That was terrible. You lost.";
-      }
-      default: {
-        yield "Try again.";
-      }
-    };
-
-    System.out.println(result);
-  }
-
-  static void switchItWithMultiCase() {
-    var result = switch (new Random().nextInt(20)) {
-      case 7, 13 -> "You're the winner";
-      case 0 -> "That was terrible. You lost.";
-      default -> "Try again.";
-    };
-
-    System.out.println(result);
-  }
-
-}
-```
-
-[13] **Text blocks**
-
-```java {4-9}
-public class Playground {
-
-  public static void main(String[] args) {
-    var block = """
-            {
-                "foo": "bar",
-                "bar": 13
-            }
-            """;
-
-    System.out.println(block);
-  }
-
-}
-```
-
-[14] **Records**
-
-```java
-public class Playground {
-
-  public static void main(String[] args) {
-    var p1 = new Point(5.2f, 1.3f);
-    var p2 = new Point(5.2f, 1.3f);
-
-    p1.x = 4.6f // compile error - final fields, immutable
-
-    System.out.println(p1.equals(p2)); // true (equals, hashCode)
-    System.out.println(p1); // Point[x=5.2, y=1.3] (toString)
-  }
-
-  static record Point(float x, float y) { }
-
-  // compile error, records are final and cannot be used for inheritance
-  static record Point3d(float x, float y, float z) extends Point { }
-
-}
-```
-
-[14] **Pattern Matching for `instanceof`**
-
-```java {26,28}
-public class Playground {
-
-  public static void main(String[] args) {
-    withMatching(new Cat());
-    withMatching(new Dog());
-    withoutMatching(new Cat());
-    withoutMatching(new Dog());
-  }
-
-  interface Animal { }
-
-  static class Cat implements Animal {
-    void miau() {
-      System.out.println("miau");
-    }
-  }
-
-  static class Dog implements Animal {
-    void wuff() {
-      System.out.println("wuff");
-    }
-  }
-
-  // since 14
-  static void withMatching(Animal animal) {
-    if (animal instanceof Cat c) {
-      c.miau();
-    } else if (animal instanceof Dog d) {
-      d.wuff();
-    }
-  }
-
-  // before 14
-  static void withoutMatching(Animal animal) {
-    if (animal instanceof Cat) {
-      Cat c = (Cat) animal;
-      c.miau();
-    } else if (animal instanceof Dog) {
-      Dog d = (Dog) animal;
-      d.wuff();
-    }
-  }
-
-}
-```
-
-[15] **Sealed Classes**
-
-```java
-public class Playground {
-
-  public static void main(String[] args) {
-    withMatching(new Animal.Cat());
-    withMatching(new Animal.Dog());
-  }
-
-  sealed interface Animal permits Animal.Cat, Animal.Dog {
-    record Cat() implements Animal {
-      void miau() {
-        System.out.println("miau");
-      }
-    }
-
-    record Dog() implements Animal {
-      void wuff() {
-        System.out.println("wuff");
-      }
-    }
-  }
-
-  static void withMatching(Animal animal) {
-    if (animal instanceof Animal.Cat c) {
-      c.miau();
-    } else if (animal instanceof Animal.Dog d) {
-      d.wuff();
-    }
-  }
-
-}
-```
+- [Sealed Types](https://openjdk.java.net/jeps/360)

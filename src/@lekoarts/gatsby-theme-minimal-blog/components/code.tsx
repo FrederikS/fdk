@@ -92,7 +92,7 @@ const Code = ({
       {({ className, style, tokens, getLineProps, getTokenProps }: HighlightInnerProps) => (
         <React.Fragment>
           {title && (
-            <div className="code-title" data-linenumber={hasLineNumbers}>
+            <div id={title} className="code-title" data-linenumber={hasLineNumbers}>
               <div>{title}</div>
             </div>
           )}

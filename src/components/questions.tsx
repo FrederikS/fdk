@@ -127,7 +127,7 @@ export function Questions() {
                 <Box
                   mx={3}
                   sx={{
-                    "& .gatsby-highlight": {
+                    "& .gatsby-highlight, .code-title": {
                       mx: [-4, -3, -3, -3],
                     },
                   }}

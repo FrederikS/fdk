@@ -206,6 +206,8 @@ export const globalStyles = (t) => {
       marginLeft: `-${t.space[3]}`,
       marginRight: `-${t.space[3]}`,
       marginTop: t.space[2],
+      borderTopLeftRadius: t.space[2],
+      borderTopRightRadius: t.space[2],
       fontFamily: `monospace`,
       '&[data-linenumber="false"]': {
         paddingLeft: t.space[3],
