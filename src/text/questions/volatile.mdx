@@ -3,16 +3,19 @@ question: What is the volatile keyword? How and why would you use it?
 ---
 
 The `volatile` modifier guarantees, that any thread that reads a field, will see
-the most recently written value. These variables are directly written to and
-read from the main memory instead of the CPU cache. Reading and writing to main
-memory is more expensive. If two thread are reading and writing to a shared
-variable, where the new value is generated based on the previous value (needs a
-read before writing), volatile is not enough. The short time gap between reading
-and writing creates a race condition, where multiple threads might read the same
-value and overwrite each others value. In that case you need to use
-`synchronized` keyword (or `AtomicReference`, `AtomicInteger`, ...) to guarantee
-atomic reads and writes. One common use-case for using `volatile` is for a flag
-to terminate a thread.
+the **most recently written value**.
+
+These variables are directly written to and read from the main memory instead of
+the CPU cache. Reading and writing to main memory is more expensive.
+
+If two thread are reading and writing to a shared variable, where the new value
+is generated based on the previous value (needs a read before writing), volatile
+is not enough. The short time gap between reading and writing creates a race
+condition, where multiple threads might read the same value and overwrite each
+others value. In that case you need to use `synchronized` keyword (or
+`AtomicReference`, `AtomicInteger`, ...) to guarantee atomic reads and writes.
+
+One common use-case for using `volatile` is for a flag to terminate a thread.
 
 ```java
 public class Foo extends Thread {
