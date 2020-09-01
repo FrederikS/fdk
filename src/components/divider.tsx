@@ -22,10 +22,17 @@ export const DividerTitle = (props: DividerTitleProps) => {
         "::after": {
           ml: 3,
         },
-        my: 3,
+        mt: 5,
+        mb: 3,
+        "ul + &": {
+          mt: 3,
+        },
+        ":first-of-type": {
+          mt: 4,
+        }
       }}
     >
-      <Heading {...props} mb={0}>
+      <Heading {...props} my={0}>
         {props.children}
       </Heading>
     </Flex>

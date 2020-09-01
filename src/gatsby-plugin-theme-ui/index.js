@@ -74,6 +74,7 @@ export default {
     },
     table: {
       ...baseTheme.styles.table,
+      my: 3,
       [[`th`, `td`]]: {
         textAlign: `left`,
         py: 1,
