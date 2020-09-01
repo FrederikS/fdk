@@ -22,7 +22,6 @@ const baseStylesChevron: SxStyleProp = {
   height: "22px",
   border: "2px solid transparent",
   borderRadius: "100px",
-  my: "auto",
   marginRight: 3,
   flex: "none",
   color: "secondary",
@@ -96,9 +95,7 @@ export function Questions() {
         return (
           <Box py={3} key={i}>
             <AccordionItem uuid={uuid}>
-              <Heading
-                as="h4"
-                variant="styles.h5"
+              <AccordionItemHeading
                 sx={{
                   cursor: "pointer",
                   ":hover .bounce": {
@@ -106,23 +103,23 @@ export function Questions() {
                   },
                 }}
               >
-                <AccordionItemHeading>
-                  <AccordionItemButton sx={{ p: 1 }}>
-                    <Flex>
-                      <AccordionItemState>
-                        {({ expanded }) =>
-                          expanded ? (
-                            <i sx={stylesChevronDown} />
-                          ) : (
-                            <i sx={stylesChevronRight} className="bounce" />
-                          )
-                        }
-                      </AccordionItemState>
+                <AccordionItemButton sx={{ p: 1 }}>
+                  <Flex sx={{ alignItems: "center" }}>
+                    <AccordionItemState>
+                      {({ expanded }) =>
+                        expanded ? (
+                          <i sx={stylesChevronDown} />
+                        ) : (
+                          <i sx={stylesChevronRight} className="bounce" />
+                        )
+                      }
+                    </AccordionItemState>
+                    <Heading as="h3" variant="styles.h5" my={0}>
                       {q._frontmatter.question}
-                    </Flex>
-                  </AccordionItemButton>
-                </AccordionItemHeading>
-              </Heading>
+                    </Heading>
+                  </Flex>
+                </AccordionItemButton>
+              </AccordionItemHeading>
               <AccordionItemPanel>
                 <Box
                   mx={3}
