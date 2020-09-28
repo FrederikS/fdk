@@ -49,6 +49,7 @@ module.exports = {
         anonymize: true,
         cookieExpires: 0,
         storage: `none`,
+        respectDNT: true,
       },
     },
     `gatsby-plugin-sitemap`,
