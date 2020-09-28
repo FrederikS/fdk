@@ -4,7 +4,7 @@ import { Box, Styled, Container, css } from "theme-ui"
 import "typeface-ibm-plex-sans"
 import SEO from "@lekoarts/gatsby-theme-minimal-blog/src/components/seo"
 import Header from "@lekoarts/gatsby-theme-minimal-blog/src/components/header"
-import Footer from "@lekoarts/gatsby-theme-minimal-blog/src/components/footer"
+import Footer from "../../../components/footer"
 import SkipNavLink from "@lekoarts/gatsby-theme-minimal-blog/src/components/skip-nav"
 import { globalStyles } from "../../../styles/global"
 
