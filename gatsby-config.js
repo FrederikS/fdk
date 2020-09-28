@@ -1,6 +1,6 @@
 require(`dotenv`).config({
   path: `.env`,
-})
+});
 
 module.exports = {
   siteMetadata: {
@@ -30,7 +30,7 @@ module.exports = {
           {
             name: `Twitter`,
             url: `https://twitter.com/Frederiiiiik`,
-          }
+          },
         ],
       },
     },
@@ -46,6 +46,9 @@ module.exports = {
       options: {
         head: true,
         trackingId: process.env.GOOGLE_ANALYTICS_ID,
+        anonymize: true,
+        cookieExpires: 0,
+        storage: `none`,
       },
     },
     `gatsby-plugin-sitemap`,
@@ -65,5 +68,4 @@ module.exports = {
     `gatsby-plugin-offline`,
     // `gatsby-plugin-webpack-bundle-analyser-v2`,
   ],
-}
-
+};
