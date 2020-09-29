@@ -1,0 +1,3 @@
+User-agent: *
+
+sitemap: https://fdk.codes/sitemap.xml
