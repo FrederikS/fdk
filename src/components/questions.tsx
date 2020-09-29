@@ -12,6 +12,7 @@ import {
   AccordionItemState,
 } from "react-accessible-accordion";
 import questions from "../text/questions";
+import { trackCustomEvent } from "gatsby-plugin-google-analytics";
 
 const baseStylesChevron: SxStyleProp = {
   boxSizing: "border-box",
@@ -83,6 +84,18 @@ export function Questions() {
     }
   });
 
+  const trackQuestionToggle = (question, expanded) => {
+    trackCustomEvent({
+      category: "Java Interview Question",
+      action: "click",
+      label: question,
+      value: {
+        collapsed: 0,
+        expanded: 1,
+      }[expanded ? "expanded" : "collapsed"],
+    });
+  };
+
   return (
     <Accordion
       allowZeroExpanded
@@ -91,48 +104,52 @@ export function Questions() {
     >
       {questions.map((q, i) => {
         const Answer = q.default;
+        const question = q._frontmatter.question;
         const uuid = i + preExpanded.length + "";
         return (
           <Box py={3} key={i}>
             <AccordionItem uuid={uuid}>
-              <AccordionItemHeading
-                sx={{
-                  cursor: "pointer",
-                  ":hover .bounce": {
-                    animation: `${bounceRight} .3s alternate ease infinite`,
-                  },
-                }}
-              >
-                <AccordionItemButton sx={{ p: 1 }}>
-                  <Flex sx={{ alignItems: "center" }}>
-                    <AccordionItemState>
-                      {({ expanded }) =>
-                        expanded ? (
-                          <i sx={stylesChevronDown} />
-                        ) : (
-                          <i sx={stylesChevronRight} className="bounce" />
-                        )
-                      }
-                    </AccordionItemState>
-                    <Heading as="h3" variant="styles.h5" my={0}>
-                      {q._frontmatter.question}
-                    </Heading>
-                  </Flex>
-                </AccordionItemButton>
-              </AccordionItemHeading>
-              <AccordionItemPanel>
-                <Box
-                  mx={3}
-                  sx={{
-                    "& .gatsby-highlight, .code-title": {
-                      mx: [-4, -3, -3, -3],
-                    },
-                  }}
-                  paddingTop={2}
-                >
-                  <Answer />
-                </Box>
-              </AccordionItemPanel>
+              <AccordionItemState>
+                {({ expanded }) => (
+                  <React.Fragment>
+                    <AccordionItemHeading
+                      sx={{
+                        cursor: "pointer",
+                        ":hover .bounce": {
+                          animation: `${bounceRight} .3s alternate ease infinite`,
+                        },
+                      }}
+                      onClick={() => trackQuestionToggle(question, !expanded)}
+                    >
+                      <AccordionItemButton sx={{ p: 1 }}>
+                        <Flex sx={{ alignItems: "center" }}>
+                          {expanded ? (
+                            <i sx={stylesChevronDown} />
+                          ) : (
+                            <i sx={stylesChevronRight} className="bounce" />
+                          )}
+                          <Heading as="h3" variant="styles.h5" my={0}>
+                            {question}
+                          </Heading>
+                        </Flex>
+                      </AccordionItemButton>
+                    </AccordionItemHeading>
+                    <AccordionItemPanel>
+                      <Box
+                        mx={3}
+                        sx={{
+                          "& .gatsby-highlight, .code-title": {
+                            mx: [-4, -3, -3, -3],
+                          },
+                        }}
+                        paddingTop={2}
+                      >
+                        <Answer />
+                      </Box>
+                    </AccordionItemPanel>
+                  </React.Fragment>
+                )}
+              </AccordionItemState>
             </AccordionItem>
           </Box>
         );
